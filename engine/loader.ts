@@ -11,12 +11,12 @@ function getVersionList(callback) {
   console.log('Retrieving available version list...');
 
   const mem = new MemoryStream(null, { readable: false });
-  https.get('https://ethereum.github.io/solc-bin/bin/list.json', function (response) {
+  https.get('https://ethereum.github.io/solc-bin/bin/list.json', function(response) {
     if (response.statusCode !== 200) {
       console.log('Error downloading file: ' + response.statusCode);
     }
     response.pipe(mem);
-    response.on('end', function () {
+    response.on('end', function() {
       callback(mem.toString());
     });
   });
@@ -25,18 +25,18 @@ function getVersionList(callback) {
 function downloadBinary(version, callback?: (filename: string) => void) {
   console.log('Downloading version', version);
 
-  getVersionList((pkgRaw) => {
+  getVersionList(pkgRaw => {
     const pkg = JSON.parse(pkgRaw);
     const engineUrl = `https://ethereum.github.io/solc-bin/bin/${pkg.releases[version]}`;
     console.log(engineUrl);
     const filename = path.join(DATA_DIR, `${version}.js`);
     const file = fs.createWriteStream(filename);
-    https.get(engineUrl, function (response) {
+    https.get(engineUrl, function(response) {
       if (response.statusCode !== 200) {
         console.log('Error downloading file: ' + response.statusCode);
       }
       response.pipe(file);
-      file.on('finish', function () {
+      file.on('finish', function() {
         file.close();
         callback && callback(filename);
       });
@@ -57,11 +57,13 @@ export default function loader(version) {
     if (ENGINE_CACHE[version]) {
       resolve(ENGINE_CACHE[version]);
     } else {
-      ensureEngine(version).then((enginePath: string) => {
-        const engineBase = require(enginePath);
-        ENGINE_CACHE[version] = solcWrapper(engineBase);
-        resolve(ENGINE_CACHE[version]);
-      }).catch(reject);
+      ensureEngine(version)
+        .then((enginePath: string) => {
+          const engineBase = require(enginePath);
+          ENGINE_CACHE[version] = solcWrapper(engineBase);
+          resolve(ENGINE_CACHE[version]);
+        })
+        .catch(reject);
     }
   });
 }

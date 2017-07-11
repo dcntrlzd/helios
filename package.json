@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon -w ./src -w ./engine -e js,ts,sol --exec \"ts-node engine/runner.ts\"",
     "test": "jest",
-    "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts", 
+    "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write", 
     "solc": "solcjs"
   },
   "author": "",
