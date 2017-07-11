@@ -1,0 +1,50 @@
+{
+  "name": "solist",
+  "version": "1.0.0",
+  "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon -w ./src -w ./engine -e js,ts,sol --exec \"ts-node engine/runner.ts\"",
+    "test": "jest",
+    "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts", 
+    "solc": "solcjs"
+  },
+  "author": "",
+  "license": "ISC",
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "parser": "typescript"
+  },
+  "dependencies": {
+    "@types/node": "^8.0.10",
+    "ethereumjs-account": "^2.0.4",
+    "ethereumjs-block": "^1.5.1",
+    "ethereumjs-blockchain": "^2.0.0",
+    "ethereumjs-util": "^5.1.2",
+    "ethereumjs-vm": "^2.1.0",
+    "glob": "^7.1.2",
+    "jest": "^20.0.4",
+    "leveldown": "^1.7.2",
+    "levelup": "^1.3.8",
+    "memdown": "^1.2.4",
+    "memorystream": "^0.3.1",
+    "merkle-patricia-tree": "^2.1.2",
+    "nodemon": "^1.11.0",
+    "solc": "^0.4.13",
+    "ts-node": "^3.2.0",
+    "typescript": "^2.4.1"
+  },
+  "jest": {
+    "verbose": true,
+    "transformIgnorePatterns": [
+      "/src/",
+      "/data/",
+      "/engine/",
+      "/node_modules/"
+    ]
+  },
+  "devDependencies": {
+    "prettier": "^1.5.2"
+  }
+}
