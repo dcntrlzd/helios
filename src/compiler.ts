@@ -1,9 +1,17 @@
 import * as fs from 'fs';
+import loader from './loader';
 
-export default function compiler(file: string, engine: any) {
-  return new Promise(
-    (resolve: (api: any, result: any) => void, reject: (errors: string[]) => void) => {
-      const source = fs.readFileSync(`${__dirname}/../src/${file}`).toString();
+export function loadContract(file: string): string {
+  return fs.readFileSync(file).toString();
+}
+
+type Resolver = (api: any, result: any) => void;
+type Rejector = (errors: string[]) => void;
+
+export default function compiler(file: string, version: string) {
+  return loader(version).then((engine: any) => new Promise(
+    (resolve: Resolver, reject: Rejector) => {
+      const source = loadContract(file);
       const result = engine.compile(source);
 
       if (result.errors) return reject(result.errors);
@@ -14,11 +22,10 @@ export default function compiler(file: string, engine: any) {
         // compiled contract names start with a colon character
         // so we remove it to make it easier to use (thorugh desconstructors especially)
         const contractName = key.replace(/^:/, '');
-        console.log(contractName);
         return Object.assign(acc, { [contractName]: contracts[key] });
       }, {});
 
       return resolve(API, result);
     }
-  );
+  ));
 }

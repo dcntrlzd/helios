@@ -1,0 +1,3 @@
+[submodule "types/web3-typescript-typings"]
+	path = types/web3-typescript-typings
+	url = git@github.com:matrushka/web3-typescript-typings.git
