@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "npm-run-all -p start:*",
-    "start:compile": "tsc --outDir build --watch",
-    "start:run": "nodemon -w ./build -w ./test -e js,sol --exec \"jest\"",
+    "start:compile": "tsc --outDir dist --watch",
+    "start:run": "nodemon -w ./dist -w ./test -e js,sol --exec \"jest\"",
     "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write"
   },
   "author": "",
@@ -24,7 +24,9 @@
     "jest": "^20.0.4",
     "jest-jasmine2": "^20.0.4",
     "memorystream": "^0.3.1",
+    "mkdirp": "^0.5.1",
     "nodemon": "^1.11.0",
+    "rimraf": "^2.6.1",
     "solc": "^0.4.13",
     "ts-node": "^3.2.0",
     "typescript": "^2.4.1",
@@ -33,7 +35,7 @@
   "jest": {
     "verbose": true,
     "testEnvironment": "node",
-    "testRunner": "<rootDir>/build/runner.js"
+    "testRunner": "<rootDir>/dist/runner.js"
   },
   "devDependencies": {
     "@types/async": "^2.0.40",

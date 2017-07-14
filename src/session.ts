@@ -27,7 +27,7 @@ export default class Session {
       const [ account ] = accounts;
       if (!account) throw new Error('No initial account found in blockchain');
       this.web3.eth.defaultAccount = account;
-      runner(this.web3)
+      runner(this.web3);
     });
   }
 }

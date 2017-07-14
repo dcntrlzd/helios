@@ -1,4 +1,3 @@
 node_modules
-.cachedb
-data/*
-.build
+.solcache
+dist

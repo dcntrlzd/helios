@@ -1,14 +1,32 @@
-const path = require('path');
-const contract = path.join(__dirname, 'SimpleStorage.sol');
+const async = require('async');
 
-it('runs 1', () => {
-  return compile(contract, '0.4.11').then(console.log)
-});
+const { SimpleStorage } = eth.compile('test/SimpleStorage.sol');
 
-it('runs 2', () => {
-  
-});
+it('stores & retrieves the value', (done) => {
+  eth.run((web3) => {
+    async.waterfall([
+      (callback) => {
+        const { abi, data } = SimpleStorage;
 
-it('runs 3', () => {
-  
+        web3.eth.contract(abi).new({ data }, (err, res) => {
+          if (err) return callback(err, null);
+          if (res.address) return callback(null, res);
+        });
+      },
+      (deployedContract, callback) => {
+        contract = deployedContract;
+        contract.get(callback);
+      },
+      (value, callback) => {
+        expect(value.toNumber()).toBe(0);
+        contract.set(10, callback);
+      },
+      (txId, callback) => {
+        contract.get(callback);
+      },
+      (value) => {
+        expect(value.toNumber()).toBe(10);
+      },
+    ], done);
+  });
 });
