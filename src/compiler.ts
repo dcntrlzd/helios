@@ -33,7 +33,7 @@ type CompilerOptions = {
 
 let solc;
 
-export default class Compiler {
+export class Compiler {
   cache: ContractCache = {};
   rootDir: string;
   cacheDir: string;
@@ -88,13 +88,7 @@ export default class Compiler {
     fs.writeFileSync(contractCachePath, JSON.stringify({ key: contractKey, entry: cacheEntry }));
   }
 
-  public compile(contractKey: string): CompiledContract {
-    const source = this.loadContract(contractKey);
-    const checksum = this.getChecksum(source);
-
-    const cacheEntry = this.cache[contractKey];
-    if (cacheEntry && cacheEntry.checksum === checksum) return cacheEntry.value;
-
+  public process(source: string): CompiledContract {
     // Only require when it's needed to shave some init time
     if (!solc) solc = require('solc');
     const result = solc.compile(source);
@@ -103,7 +97,7 @@ export default class Compiler {
 
     const { contracts } = result;
 
-    const api = Object.keys(contracts).reduce((acc, key) => {
+    const compiledContract = Object.keys(contracts).reduce((acc, key) => {
       // compiled contract names start with a colon character
       // so we remove it to make it easier to use (thorugh desconstructors especially)
       const contractName = key.replace(/^:/, '');
@@ -113,8 +107,21 @@ export default class Compiler {
       return Object.assign(acc, { [contractName]: { abi: JSON.parse(rawAbi) as Web3.ContractAbi, data } });
     }, {});
 
-    this.cacheEntry(contractKey, { checksum, value: api });
+    return compiledContract;
+  }
 
-    return api;
+  public compile(contractKey: string): CompiledContract {
+    const source = this.loadContract(contractKey);
+    const checksum = this.getChecksum(source);
+
+    const cacheEntry = this.cache[contractKey];
+    if (cacheEntry && cacheEntry.checksum === checksum) return cacheEntry.value;
+
+    const compiledContract = this.process(source);
+    this.cacheEntry(contractKey, { checksum, value: compiledContract });
+
+    return compiledContract;
   }
 }
+
+export default new Compiler();

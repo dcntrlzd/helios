@@ -7,7 +7,7 @@ type SessionOptions = {
 
 export default class Session {
   private provider: any;
-  private web3: Web3;
+  public web3: Web3;
 
   constructor(options?: SessionOptions) {
     this.provider = TestRPC.provider(options);
@@ -15,13 +15,14 @@ export default class Session {
     this.web3.setProvider(this.provider);
   }
 
-  onStep(callback: Function) {
+  public attachDebugger(callback): void {
+    console.log('ATTACHING DEBUGGER');
     if (!this.provider.manager.state.blockchain.vm) throw new Error('VM not ready yet');
     // HARDCORE DEBUGGER:
     this.provider.manager.state.blockchain.vm.on('step', callback);
   }
 
-  run(runner: (web3: Web3) => void) {
+  public run(runner: (web3: Web3) => void) {
     this.web3.eth.getAccounts((error: Error, accounts: string[]) => {
       if (error) throw error;
       const [ account ] = accounts;
