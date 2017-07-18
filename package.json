@@ -6,7 +6,8 @@
   "scripts": {
     "start": "npm-run-all -p start:*",
     "start:compile": "tsc --outDir dist --watch",
-    "start:run": "nodemon -w ./dist -w ./test -e js,sol --exec \"jest\"",
+    "start:testrpc": "testrpc > testrpc.log",
+    "start:run": "TESTRPC_URL=http://localhost:8545 nodemon -w ./dist -w ./test -e js,sol -x \"jest --notify\"",
     "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write"
   },
   "author": "",
@@ -35,7 +36,6 @@
   "jest": {
     "verbose": true,
     "testEnvironment": "node",
-    "testRunner": "<rootDir>/dist/runner.js",
     "moduleFileExtensions": [
       "js",
       "json",
@@ -45,7 +45,11 @@
     ],
     "transform": {
       "^.+\\.sol?$": "<rootDir>/dist/preprocessor.js"
-    }
+    },
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/",
+      "<rootDir>/dist/"
+    ]
   },
   "devDependencies": {
     "@types/async": "^2.0.40",

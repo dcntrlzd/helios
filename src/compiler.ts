@@ -5,11 +5,20 @@ import * as Web3 from 'web3';
 import * as mkdirp from 'mkdirp';
 import * as glob from 'glob';
 
-type CompiledContract = {
-  [contractName: string]: {
-    abi: Web3.ContractAbi,
-    data: string
-   }
+type GasEstimates = {
+  creation: [number, number],
+  external: { [method: string]: number },
+  internal: { [method: string]: number },
+};
+
+export type CompiledContract = {
+  abi: Web3.ContractAbi,
+  data: string,
+  gasEstimates: GasEstimates,
+};
+
+export type CompiledContractMap = {
+  [contractName: string]: CompiledContract
 };
 
 type CacheRecord = {
@@ -19,7 +28,7 @@ type CacheRecord = {
 
 type CacheEntry = {
   checksum: string,
-  value: CompiledContract,
+  value: CompiledContractMap,
 };
 
 type ContractCache = {
@@ -88,7 +97,7 @@ export class Compiler {
     fs.writeFileSync(contractCachePath, JSON.stringify({ key: contractKey, entry: cacheEntry }));
   }
 
-  public process(source: string): CompiledContract {
+  public process(source: string): CompiledContractMap {
     // Only require when it's needed to shave some init time
     if (!solc) solc = require('solc');
     const result = solc.compile(source);
@@ -97,30 +106,30 @@ export class Compiler {
 
     const { contracts } = result;
 
-    const compiledContract = Object.keys(contracts).reduce((acc, key) => {
+    const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
       // compiled contract names start with a colon character
       // so we remove it to make it easier to use (thorugh desconstructors especially)
       const contractName = key.replace(/^:/, '');
 
-      const { interface: rawAbi, bytecode: data } = contracts[key];
+      const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
 
-      return Object.assign(acc, { [contractName]: { abi: JSON.parse(rawAbi) as Web3.ContractAbi, data } });
+      return Object.assign(acc, { [contractName]: { abi: JSON.parse(rawAbi) as Web3.ContractAbi, data, gasEstimates } });
     }, {});
 
-    return compiledContract;
+    return compiledContractMap;
   }
 
-  public compile(contractKey: string): CompiledContract {
+  public compile(contractKey: string): CompiledContractMap {
     const source = this.loadContract(contractKey);
     const checksum = this.getChecksum(source);
 
     const cacheEntry = this.cache[contractKey];
     if (cacheEntry && cacheEntry.checksum === checksum) return cacheEntry.value;
 
-    const compiledContract = this.process(source);
-    this.cacheEntry(contractKey, { checksum, value: compiledContract });
+    const compiledContractMap = this.process(source);
+    this.cacheEntry(contractKey, { checksum, value: compiledContractMap });
 
-    return compiledContract;
+    return compiledContractMap;
   }
 }
 
