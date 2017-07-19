@@ -3,18 +3,21 @@ import Session from './session';
 import compiler from './compiler';
 
 let session = new Session();
-let snapshotId;
 
 declare const beforeEach: (any) => void;
 declare const afterEach: (any) => void;
 
-beforeEach(async () => {
-  snapshotId = await session.snapshot();
-});
+if (typeof beforeEach !== undefined && typeof afterEach !== undefined) {
+  let snapshotId;
 
-afterEach(async () => {
-  if (snapshotId) await session.revert(snapshotId);
-});
+  beforeEach(async () => {
+    snapshotId = await session.snapshot();
+  });
+
+  afterEach(async () => {
+    if (snapshotId) await session.revert(snapshotId);
+  });
+}
 
 function sync(context, method, ...args) {
   return new Promise((resolve: Function, reject: Function) => {
@@ -28,5 +31,10 @@ function sync(context, method, ...args) {
 }
 
 
-export = { sync, deploy: session.deploy.bind(session), session };
+export = {
+  sync,
+  deploy: session.deploy.bind(session),
+  client: session.client,
+  session,
+};
 

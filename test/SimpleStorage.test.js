@@ -8,7 +8,8 @@ it ('can run with async/await', async () => {
   expect.assertions(2);
 
   const { web3 } = eth.session;
-  const [account] = await eth.sync(web3.eth, web3.eth.getAccounts)
+
+  const [account] = await eth.client.getAccounts()
   web3.eth.defaultAccount = account;
   
   const contract = await eth.deploy(SimpleStorage);

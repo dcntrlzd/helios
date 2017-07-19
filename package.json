@@ -1,13 +1,12 @@
 {
   "name": "solist",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
     "start": "npm-run-all -p start:*",
     "start:compile": "tsc --outDir dist --watch",
-    "start:testrpc": "testrpc > testrpc.log",
-    "start:run": "TESTRPC_URL=http://localhost:8545 nodemon -w ./dist -w ./test -e js,sol -x \"jest --notify\"",
+    "start:run": "nodemon -w ./dist -w ./test -e js,sol -x \"jest --notify\"",
     "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write"
   },
   "author": "",
