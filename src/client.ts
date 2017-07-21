@@ -58,10 +58,6 @@ type Block = {
   uncles: Block[],
 };
 
-type Contract<A> = {
-  [P in keyof A]: (...args) => Promise<any>
-};
-
 type DeployOptions = {
   contractName?: string,
   from?: string,
