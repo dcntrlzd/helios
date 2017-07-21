@@ -4,22 +4,20 @@ const { default: Session } = require('../dist/session');
 
 const { SimpleStorage } = require('./SimpleStorage.sol');
 
-it ('can run with async/await', async () => {
+it ('can run with async/await and solist/client', async () => {
   expect.assertions(2);
 
-  const { web3 } = eth.session;
-
   const [account] = await eth.client.getAccounts()
-  web3.eth.defaultAccount = account;
+  eth.client.setCurrentAccount(account);
   
-  const contract = await eth.deploy(SimpleStorage);
+  const contract = await eth.client.deployContract(SimpleStorage);
 
-  expect((await eth.sync(contract, contract.get)).toNumber()).toBe(0);
-  await eth.sync(contract, contract.set, 10);
-  expect((await eth.sync(contract, contract.get)).toNumber()).toBe(10);
+  expect((await contract.get()).toNumber()).toBe(0);
+  await contract.set(10);
+  expect((await contract.get()).toNumber()).toBe(10);
 });
 
-it('stores & retrieves the value', (done) => {
+it('stores & retrieves the value with web3 fully', (done) => {
   const { web3 } = eth.session
   async.waterfall([
     // (callback) => {

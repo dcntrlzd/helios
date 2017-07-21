@@ -1,5 +1,6 @@
 import * as Web3 from 'web3';
 import { BigNumber } from 'bignumber.js';
+import { CompiledContract } from './compiler';
 
 type BlockID = string | number;
 
@@ -57,9 +58,24 @@ type Block = {
   uncles: Block[],
 };
 
+type Contract<A> = {
+  [P in keyof A]: (...args) => Promise<any>
+};
+
+type DeployOptions = {
+  contractName?: string,
+  from?: string,
+  gas?: number,
+  gasPrice?: number,
+  args?: any[],
+};
+
 export default class Client {
   private web3: Web3;
+
   public METHOD_PATTERN = /^(get|is|send|sign|call)([A-Z].*)?$/;
+  public DEPLOYMENT_GAS = 3141592;
+  public DEPLOYMENT_GAS_PRICE = 100000000000;
 
   // API for typescript:
   // wrapped web3.eth methods matching METHOD_PATTERN
@@ -99,6 +115,64 @@ export default class Client {
 
       this[methodName] = this.promisify(method, this.web3.eth);
     });
+  }
+
+  public getCurrentAccount(): string {
+    return this.web3.eth.defaultAccount;
+  }
+
+  public setCurrentAccount(account: string): void {
+    this.web3.eth.defaultAccount = account;
+  }
+
+  public defineContract<C>(compiledContract: CompiledContract, address: string): Promise<Web3.Contract<C>> {
+    return new Promise<Web3.Contract<C>>((resolve, reject) => {
+      const { abi, data } = compiledContract;
+      const contract = this.web3.eth.contract<any>(abi);
+      resolve(this.promisifyContract(contract.at(address)));
+    });
+  }
+
+  public deployContract<C>(compiledContract: CompiledContract, options: DeployOptions = {}): Promise<Web3.Contract<C>> {
+    const {
+      from,
+      args = [],
+      gas = this.DEPLOYMENT_GAS,
+      gasPrice = this.DEPLOYMENT_GAS_PRICE
+    } = options;
+
+    return new Promise<Web3.Contract<C>>((resolve, reject) => {
+      const { abi, data } = compiledContract;
+      const contract = this.web3.eth.contract<any>(abi);
+      const deployOptions = { data, gas, gasPrice };
+
+      if (from) Object.assign(deployOptions, { from });
+
+      const deployArguments = [
+        ...args,
+        deployOptions,
+        (err: any, res: Web3.Contract<C>) => {
+          if (err) return reject(err);
+          if (res.address) return resolve(this.promisifyContract(res));
+        }
+      ];
+
+      contract.new(...deployArguments);
+    });
+  }
+
+  private promisifyContract<C>(baseContract: Web3.Contract<C>): Web3.Contract<C> {
+    const contract = { ...baseContract };
+
+    contract.abi.forEach((abiItem: Web3.AbiDefinition) => {
+      const { name } = abiItem;
+      const method = contract[name];
+      if (!method) return;
+
+      contract[name] = this.promisify(method, contract);
+    });
+
+    return contract;
   }
 
   private promisify(method: (...methodArgs: any[]) => any, context: any): (...args) => Promise<any> {

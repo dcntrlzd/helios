@@ -9,7 +9,9 @@ type SessionOptions = {
 
 type DeployOptions = {
   contractName?: string,
-  from?: string
+  from?: string,
+  gas?: number,
+  gasPrice?: number,
 };
 
 export default class Session {
@@ -44,11 +46,11 @@ export default class Session {
   }
 
   public deploy<C>(compiledContract: CompiledContract, options: DeployOptions = {}, ...args): Promise<Web3.Contract<C>> {
-    const { from } = options;
+    const { from, gas = this.DEPLOYMENT_GAS, gasPrice = this.DEPLOYMENT_GAS_PRICE } = options;
     return new Promise<Web3.Contract<C>>((resolve, reject) => {
       const { abi, data } = compiledContract;
       const contract = this.web3.eth.contract<any>(abi);
-      const deployOptions = { data, gas: this.DEPLOYMENT_GAS, gasPrice: this.DEPLOYMENT_GAS_PRICE };
+      const deployOptions = { data, gas, gasPrice };
 
       if (from) Object.assign(deployOptions, { from });
 

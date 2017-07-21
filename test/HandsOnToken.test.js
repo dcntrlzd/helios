@@ -12,39 +12,44 @@ const ETH_TO_WEI = 1000000000000000000;
 
 describe('HandsOnToken', () => {
   it('Creates the token', async () => {
-    const { web3 } = eth.session;
-    const [account] = await eth.sync(web3.eth, web3.eth.getAccounts)
-    web3.eth.defaultAccount = account;
+    const [account] = await eth.client.getAccounts();
+    eth.client.setCurrentAccount(account);
 
-    const contract = await eth.deploy(HandsOnToken, {}, INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT');
-    
-    const value = await eth.sync(contract, contract.balanceOf, account);
+    const contract = await eth.client.deployContract(HandsOnToken, {
+      args: [INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT']
+    });
+
+    const value = await contract.balanceOf(account);
     expect(value.toNumber()).toBe(Math.pow(10, DECIMALS) * INITIAL_SUPPLY);
   });
 });
 
 describe('ExchangeOffice', () => {
   it('Creates the contract and exchanges ETH for HOT', async () => {
-    const { web3 } = eth.session;
-    const accounts = await eth.sync(web3.eth, web3.eth.getAccounts)
+    const accounts = await eth.client.getAccounts();
+
     const [account, testAccount] = accounts;
-    web3.eth.defaultAccount = account;
+    eth.client.setCurrentAccount(account);
 
-    const token = await eth.deploy(HandsOnToken, {}, INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT');
+    const token = await eth.client.deployContract(HandsOnToken, {
+      args: [INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT']
+    });
 
-    const contract = await eth.deploy(ExchangeOffice, {}, 1000, token.address);
+    const contract = await eth.client.deployContract(ExchangeOffice, {
+      args: [1000, token.address]
+    });
   
     // Transfer tokens to the exchange office
-    await eth.sync(token, token.transfer, contract.address, 1000 * Math.pow(10, DECIMALS));
-    const value = await eth.sync(token, token.balanceOf, contract.address);
+    await token.transfer(contract.address, 1000 * Math.pow(10, DECIMALS));
+    const value = await token.balanceOf(contract.address);
     expect(value.toNumber()).toBe(Math.pow(10, DECIMALS) * 1000);
 
     // Run the exchange contract
-    web3.eth.defaultAccount = testAccount;
-    await eth.sync(web3.eth, web3.eth.sendTransaction, { to: contract.address, value: 2.5 * ETH_TO_WEI, gas: eth.session.DEPLOYMENT_GAS });
-    const balanceOfContract= await eth.sync(web3.eth, web3.eth.getBalance, contract.address);
-    const tokenBalanceOfTestAccount = await eth.sync(token, token.balanceOf, testAccount);
-    const tokenBalanceOfContract = await eth.sync(token, token.balanceOf, contract.address);
+    eth.client.setCurrentAccount(testAccount);
+    await eth.client.sendTransaction({ to: contract.address, value: 2.5 * ETH_TO_WEI, gas: eth.session.DEPLOYMENT_GAS });
+    const balanceOfContract = await eth.client.getBalance(contract.address);
+    const tokenBalanceOfTestAccount = await token.balanceOf(testAccount);
+    const tokenBalanceOfContract = await token.balanceOf(contract.address);
 
     // Assert values
     expect(tokenBalanceOfTestAccount.toNumber()).toBe(2500);
