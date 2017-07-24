@@ -11,6 +11,10 @@ type GasEstimates = {
   internal: { [method: string]: number },
 };
 
+type CompileOptions = {
+  includeData?: boolean,
+};
+
 export type CompiledContract = {
   abi: Web3.ContractAbi,
   data: string,
@@ -42,7 +46,7 @@ type CompilerOptions = {
 
 let solc;
 
-export class Compiler {
+export default class Compiler {
   cache: ContractCache = {};
   rootDir: string;
   cacheDir: string;
@@ -97,7 +101,7 @@ export class Compiler {
     fs.writeFileSync(contractCachePath, JSON.stringify({ key: contractKey, entry: cacheEntry }));
   }
 
-  public process(source: string): CompiledContractMap {
+  public static process(source: string, options?: CompileOptions): CompiledContractMap {
     // Only require when it's needed to shave some init time
     if (!solc) solc = require('solc');
     const result = solc.compile(source);
@@ -105,6 +109,8 @@ export class Compiler {
     if (result.errors) throw new Error(result.errors);
 
     const { contracts } = result;
+    const { includeData = true } = (options || {});
+    console.log(options);
 
     const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
       // compiled contract names start with a colon character
@@ -112,8 +118,10 @@ export class Compiler {
       const contractName = key.replace(/^:/, '');
 
       const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
+      const compiledContract = { abi: JSON.parse(rawAbi) as Web3.ContractAbi, gasEstimates };
+      if (includeData) Object.assign(compiledContract, { data });
 
-      return Object.assign(acc, { [contractName]: { abi: JSON.parse(rawAbi) as Web3.ContractAbi, data, gasEstimates } });
+      return Object.assign(acc, { [contractName]: compiledContract });
     }, {});
 
     return compiledContractMap;
@@ -126,11 +134,9 @@ export class Compiler {
     const cacheEntry = this.cache[contractKey];
     if (cacheEntry && cacheEntry.checksum === checksum) return cacheEntry.value;
 
-    const compiledContractMap = this.process(source);
+    const compiledContractMap = Compiler.process(source);
     this.cacheEntry(contractKey, { checksum, value: compiledContractMap });
 
     return compiledContractMap;
   }
 }
-
-export default new Compiler();

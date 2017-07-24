@@ -1,32 +1,31 @@
 * compile with https://github.com/ethereum/solc-js (solc)
-* run with https://github.com/ethereumjs/ethereumjs-vm
-* Jest fails to run solc properly so nodemon as the runner
-* check out https://github.com/ethereumjs/ethereumjs-vm/blob/master/examples/run-blockchain/index.js for running stuff on ethereumvm
-* use step handler of the vm to debug the contract
+* run with https://github.com/ethereumjs/ethereumjs-testrpc
 
-# eth-vm-js notes
-
-* Create blokchainDB to store the blockchain
-* Trie structure is used for storing the global state
-* VM is supplied with the state (trie inst.) and blockchain
-* genesis block can be generated but the generate function in readme is not so clear and examples rely on testdata.json
-* setupPreConditions sets the initial state in the storageTrie
-* Trie has to be examined
-* test-data contents has to be examined// NOTES:
-
-# VM API
-* Wallet = { privateKey: string, address: WalletAddress }
-* WalletDetails = { balance: number, txHistory: Tx[] }
-* vm.loadContracts(Owner, { [ContractName]: CompiledContractStruct }): { [ContractName]: ContractAddress }
-* vm.createWallet(Owner, initialBalance): Wallet
-* vm.inspectWallet(WalletAddress): WalletDetails
-* vm.executeContract(Owner, ContractAddress, Arguments): ?
+# FW structure
+* session/test-runner
+  * Runs tests in jest or any test runner
+* client
+  * Provides a prettier web3 interface with promises
+  * Also used for deploying contracts etc.
+* loader
+  * Webpack loader for reading sol files
+* state/migrations
+  * Runs the migrations code
+  * Provides an interface for storing the state as configs
+  * Such as the address of your migration/manager script
 
 # TODO:
-* Create a vm instance
-* Setup initial state
-* Create contracts in the vm instance
-* execute the contracts
+* webpack loader
+* switch to flow from typescript
+* linter
+* use step handler of the vm to debug the contract
+  * Reading states etc. inside the steps
+* Migration logic
+  * Every migration should decide if it has to run or not
+  * So no migration contract provided by the framework but every dev has to come up with their own
+* App wide state storage 
+  * might be a json
 
-# NICETOHAVE:
-* cache the engine instance between runtimes to save some time
+
+# Stuff to improve
+* cache the engine instance between runtimes to save some time (depends on the test runner configuration)

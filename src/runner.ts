@@ -1,6 +1,5 @@
 import * as jasmine2 from 'jest-jasmine2';
 import Session from './session';
-import compiler from './compiler';
 
 let session = new Session();
 
