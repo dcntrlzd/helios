@@ -1,9 +1,12 @@
 import * as fs from 'fs';
+import * as process from 'process';
+import * as os from 'os';
 import * as path from 'path';
 import * as crypto from 'crypto';
 import * as Web3 from 'web3';
 import * as mkdirp from 'mkdirp';
 import * as glob from 'glob';
+import * as callsite from 'callsite';
 
 type GasEstimates = {
   creation: [number, number],
@@ -25,54 +28,35 @@ export type CompiledContractMap = {
   [contractName: string]: CompiledContract
 };
 
-type CacheRecord = {
-  key: string,
-  entry: CacheEntry,
-}
-
-type CacheEntry = {
-  checksum: string,
-  value: CompiledContractMap,
-};
-
-type ContractCache = {
-  [contractKey: string]: CacheEntry
-};
-
 type CompilerOptions = {
-  rootDir: string,
   cacheDir?: string
 };
 
 let solc;
 
 export default class Compiler {
-  cache: ContractCache = {};
-  rootDir: string;
+  static TMP_NAME='solist';
   cacheDir: string;
 
   constructor(options?: CompilerOptions) {
-    if (options) this.configure(options);
-  }
-
-  public configure(options: CompilerOptions): void {
-    const { rootDir, cacheDir = `${rootDir}/.solcache` } = options;
-    const shouldRefreshCache = this.cacheDir !== cacheDir;
-
-    this.rootDir = rootDir;
+    const cacheDir = (options && options.cacheDir) ? options.cacheDir : this.defaultCacheDir();
     this.cacheDir = cacheDir;
 
-    if (shouldRefreshCache) this.loadCache();
+    // create the cacheDir if not present or accessible
+    try {
+      fs.accessSync(this.cacheDir);
+    } catch (e) {
+      mkdirp.sync(this.cacheDir);
+    }
   }
 
-  private getContractPath(contractKey: string): string {
-    if (!this.rootDir) throw new Error('SOL Compiler rootDir is not configured');
-    return `${this.rootDir}/${contractKey}`;
-  }
-
-  private loadContract(contractKey: string): string {
-    const contractPath = this.getContractPath(contractKey);
-    return fs.readFileSync(contractPath).toString();
+  private defaultCacheDir(): string {
+    const { getuid } = process;
+    if (getuid == null) return path.join(os.tmpdir(), Compiler.TMP_NAME);
+    // On some platforms tmpdir() is `/tmp`, causing conflicts between different
+    // users and permission issues. Adding an additional subdivision by UID can
+    // help.
+    return path.join(os.tmpdir(), Compiler.TMP_NAME + '_' + getuid.call(process).toString(36));
   }
 
   private getChecksum(str, algorithm = 'md5') {
@@ -81,24 +65,6 @@ export default class Compiler {
       .update(str, 'utf8')
       .digest('hex')
       .toString();
-  }
-
-  private loadCache() {
-    const pattern = path.join(this.cacheDir, '*.json');
-    glob.sync(pattern).forEach((cacheFile: string) => {
-      const rawCacheRecord = fs.readFileSync(cacheFile).toString();
-      const cacheRecord: CacheRecord = JSON.parse(rawCacheRecord);
-      
-       this.cache[cacheRecord.key] = cacheRecord.entry;
-    });
-  }
-
-  private cacheEntry(contractKey: string, cacheEntry: CacheEntry) {
-    this.cache[contractKey] = cacheEntry;
-
-    const contractCachePath = path.join(this.cacheDir, `${this.getChecksum(contractKey).toString()}.json`);
-    mkdirp.sync(path.dirname(contractCachePath));
-    fs.writeFileSync(contractCachePath, JSON.stringify({ key: contractKey, entry: cacheEntry }));
   }
 
   public static process(source: string, options?: CompileOptions): CompiledContractMap {
@@ -110,11 +76,10 @@ export default class Compiler {
 
     const { contracts } = result;
     const { includeData = true } = (options || {});
-    console.log(options);
 
     const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
       // compiled contract names start with a colon character
-      // so we remove it to make it easier to use (thorugh desconstructors especially)
+      // so we remove it to make it easier to use (through desconstructors especially)
       const contractName = key.replace(/^:/, '');
 
       const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
@@ -127,15 +92,44 @@ export default class Compiler {
     return compiledContractMap;
   }
 
-  public compile(contractKey: string): CompiledContractMap {
-    const source = this.loadContract(contractKey);
+  private readFromCache(checksum: string): CompiledContractMap {
+    try {
+      const rawData = fs.readFileSync(path.join(this.cacheDir, `${checksum}.json`));
+      return JSON.parse(rawData.toString());
+    } catch(e) {
+      return null;
+    }
+  }
+
+  private writeToCache(contents: any): string {
+    try {
+      const json = JSON.stringify(contents);
+      const checksum = this.getChecksum(json);
+      const filePath = path.join(this.cacheDir, `${checksum}.json`)
+      fs.writeFileSync(filePath, json);
+      return checksum;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  public compile(relativePath: string): CompiledContractMap {
+    const begin = Date.now();
+
+    const [selfCall, fnCall] = callsite();
+    const refPath = path.dirname(fnCall.getFileName());
+    const contractPath = path.resolve(refPath, relativePath);
+
+    const source = fs.readFileSync(contractPath).toString();
     const checksum = this.getChecksum(source);
 
-    const cacheEntry = this.cache[contractKey];
-    if (cacheEntry && cacheEntry.checksum === checksum) return cacheEntry.value;
+    const cacheEntry = this.readFromCache(checksum);
+    if (cacheEntry) return cacheEntry;
 
     const compiledContractMap = Compiler.process(source);
-    this.cacheEntry(contractKey, { checksum, value: compiledContractMap });
+    this.writeToCache(compiledContractMap);
+
+    console.log('MEASURE', relativePath, Date.now() - begin);
 
     return compiledContractMap;
   }

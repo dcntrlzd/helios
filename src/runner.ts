@@ -1,7 +1,9 @@
 import * as jasmine2 from 'jest-jasmine2';
 import Session from './session';
+import Compiler from './compiler';
 
 let session = new Session();
+let compiler = new Compiler();
 
 declare const beforeEach: (any) => void;
 declare const afterEach: (any) => void;
@@ -18,20 +20,8 @@ if (typeof beforeEach !== undefined && typeof afterEach !== undefined) {
   });
 }
 
-function sync(context, method, ...args) {
-  return new Promise((resolve: Function, reject: Function) => {
-    args.push((err, ...results) => {
-      if (err) return reject(err);
-      resolve(...results);
-    });
-
-    method.bind(context)(...args);
-  });
-}
-
-
 export = {
-  sync,
+  compile: compiler.compile.bind(compiler),
   deploy: session.deploy.bind(session),
   client: session.client,
   session,

@@ -4,10 +4,12 @@
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
-    "start": "npm-run-all -p start:*",
-    "start:compile": "tsc --outDir dist --watch",
-    "start:run": "nodemon -w ./dist -w ./test -e js,sol -x \"jest --notify\"",
+    "testrpc": "better-npm-run testrpc",
+    "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch",
     "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write"
+  },
+  "betterScripts": {
+    "testrpc": "testrpc -m \"$TESTRPC_MNEMONIC\""
   },
   "author": "",
   "license": "ISC",
@@ -19,6 +21,7 @@
   "dependencies": {
     "async": "^2.5.0",
     "bignumber.js": "^4.0.2",
+    "callsite": "^1.0.0",
     "ethereumjs-testrpc": "^4.0.1",
     "glob": "^7.1.2",
     "jest": "^20.0.4",
@@ -38,23 +41,28 @@
     "moduleFileExtensions": [
       "js",
       "json",
-      "jsx",
+      "ts",
       "node",
       "sol"
     ],
     "transform": {
-      "^.+\\.sol?$": "<rootDir>/dist/preprocessor.js"
+      "^.+\\.(ts)$": "<rootDir>/tooling/ts-preprocessor.js"
     },
+    "testMatch": [
+      "**/__tests__/**/*.[tj]s",
+      "**/?(*.)(spec|test).[tj]s"
+    ],
     "transformIgnorePatterns": [
-      "<rootDir>/node_modules/",
-      "<rootDir>/dist/"
+      "<rootDir>/node_modules/"
     ]
   },
   "devDependencies": {
     "@types/async": "^2.0.40",
     "@types/bignumber.js": "^4.0.2",
-    "@types/jest": "^20.0.2",
+    "@types/callsite": "^1.0.30",
+    "@types/jest": "^20.0.4",
     "@types/node": "^8.0.10",
+    "better-npm-run": "0.0.15",
     "npm-run-all": "^4.0.2",
     "prettier": "^1.5.2",
     "regenerator-runtime": "^0.10.5",

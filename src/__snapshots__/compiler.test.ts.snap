@@ -1,0 +1,60 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Compiler can compile a contract 1`] = `
+Object {
+  "MyToken": Object {
+    "abi": Array [],
+    "data": "60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a72305820acfff4c5c87c722de1798c2b7f9ba0eae1cc567b4555df32b8b722181fd3323c0029",
+    "gasEstimates": Object {
+      "creation": Array [
+        62,
+        10800,
+      ],
+      "external": Object {},
+      "internal": Object {},
+    },
+  },
+  "SimpleStorage": Object {
+    "abi": Array [
+      Object {
+        "constant": false,
+        "inputs": Array [
+          Object {
+            "name": "x",
+            "type": "uint256",
+          },
+        ],
+        "name": "set",
+        "outputs": Array [],
+        "payable": false,
+        "type": "function",
+      },
+      Object {
+        "constant": true,
+        "inputs": Array [],
+        "name": "get",
+        "outputs": Array [
+          Object {
+            "name": "data",
+            "type": "uint256",
+          },
+        ],
+        "payable": false,
+        "type": "function",
+      },
+    ],
+    "data": "6060604052341561000f57600080fd5b5b60ce8061001e6000396000f30060606040526000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806360fe47b11460475780636d4ce63c146067575b600080fd5b3415605157600080fd5b60656004808035906020019091905050608d565b005b3415607157600080fd5b60776098565b6040518082815260200191505060405180910390f35b806000819055505b50565b6000805490505b905600a165627a7a72305820bfa52281ed952218e3616526c95b1d98a4e9de61e72b07ab7d34732732f4d57c0029",
+    "gasEstimates": Object {
+      "creation": Array [
+        89,
+        41200,
+      ],
+      "external": Object {
+        "get()": 396,
+        "set(uint256)": 20158,
+      },
+      "internal": Object {},
+    },
+  },
+}
+`;

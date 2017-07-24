@@ -1,15 +1,14 @@
 const async = require('async');
-const eth = require('../dist/runner');
-const { default: Session } = require('../dist/session');
+const eth = require('../src/runner.ts');
 
-const { SimpleStorage } = require('./SimpleStorage.sol');
+const { SimpleStorage } = eth.compile('./SimpleStorage.sol');
 
 it ('can run with async/await and solist/client', async () => {
   expect.assertions(2);
 
   const [account] = await eth.client.getAccounts()
   eth.client.setCurrentAccount(account);
-  
+
   const contract = await eth.client.deployContract(SimpleStorage);
 
   expect((await contract.get()).toNumber()).toBe(0);
@@ -20,9 +19,6 @@ it ('can run with async/await and solist/client', async () => {
 it('stores & retrieves the value with web3 fully', (done) => {
   const { web3 } = eth.session
   async.waterfall([
-    // (callback) => {
-    //   web3.eth.estimateGas({ data: SimpleStorage.data }, callback)
-    // },
     (callback) => {
       const { abi, data } = SimpleStorage;
 
