@@ -1,9 +1,5 @@
 pragma solidity ^0.4.0;
 
-contract MyToken {
-  
-}
-
 contract SimpleStorage {
     uint storedData;
 

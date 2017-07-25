@@ -14,11 +14,12 @@ type GasEstimates = {
   internal: { [method: string]: number },
 };
 
+type ImportResolver = (importPath: string) => string;
+
 type ImportDirective = {
   path: string,
   source: string,
   match: string,
-  checksum: string,
 };
 
 type ImportMap = {
@@ -70,7 +71,7 @@ export default class Compiler {
     return path.join(os.tmpdir(), Compiler.TMP_NAME + '_' + getuid.call(process).toString(36));
   }
 
-  private getChecksum(str, algorithm = 'md5') {
+  private static getChecksum(str, algorithm = 'md5') {
     return crypto
       .createHash(algorithm)
       .update(str, 'utf8')
@@ -120,24 +121,28 @@ export default class Compiler {
     return checksum;
   }
 
-  public buildImportList(contractPath: string, source: string): ImportDirective[] {
+  private buildImportResolver(contractPath: string): ImportResolver {
+    const basePath = path.dirname(contractPath);
+    return (importPath: string) => {
+      const filePath = path.resolve(basePath, importPath);
+      return fs.readFileSync(filePath).toString();
+    }
+  }
+
+  public static buildImportList(source: string, importResolver: ImportResolver): ImportDirective[] {
     const importPattern = /import\s+("(.*)"|'(.*)');/ig;
     const importList = [];
-    const basePath = path.dirname(contractPath);
 
     let groups;
 
     while (groups = importPattern.exec(source)) {
-      const relativePath = groups[2] || groups[3];
-      const importPath = path.resolve(basePath, relativePath);
+      const importPath = groups[2] || groups[3];
       const match = groups[0];
-      const source = fs.readFileSync(importPath).toString();
-      const checksum = this.getChecksum(source);
+      const source = importResolver(importPath);
 
       importList.push({
         match,
         source,
-        checksum,
         path: importPath,
       });
     }
@@ -151,11 +156,13 @@ export default class Compiler {
     const contractPath = path.resolve(refPath, relativePath);
 
     let source: string = fs.readFileSync(contractPath).toString();
-    this.buildImportList(contractPath, source).forEach((importDirective) => {
+    let importResolver = this.buildImportResolver(contractPath);
+
+    Compiler.buildImportList(source, importResolver).forEach((importDirective) => {
       source = source.replace(importDirective.match, importDirective.source);
     });
 
-    const checksum = this.getChecksum(source);
+    const checksum = Compiler.getChecksum(source);
 
     const cacheEntry = this.readFromCache(checksum);
     if (cacheEntry) return cacheEntry;
