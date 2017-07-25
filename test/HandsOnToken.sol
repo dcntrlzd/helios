@@ -1,31 +1,9 @@
 pragma solidity ^0.4.8;
 
-contract tokenRecipient {
-    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData);
-}
+import "./lib/Owned.sol";
+import "./lib/TokenRecipient.sol";
 
-contract owned {
-    mapping (address => bool) public owners;
-
-    function owned() {
-        owners[msg.sender] = true;
-    }
-
-    modifier onlyOwner {
-        if (owners[msg.sender] != true) revert();
-        _;
-    }
-
-    function addOwner(address ownerToAdd) onlyOwner {
-        owners[ownerToAdd] = true;
-    }
-
-    function removeOwner(address ownerToRemove) onlyOwner {
-        owners[ownerToRemove] = false;
-    }
-}
-
-contract HandsOnToken is owned {
+contract HandsOnToken is Owned {
     /* Public variables of the token */
     string public standard = "Token 0.1";
     string public name;
@@ -77,7 +55,7 @@ contract HandsOnToken is owned {
     /* Approve and then communicate the approved contract in a single tx */
     function approveAndCall(address _spender, uint256 _value, bytes _extraData)
         returns (bool success) {
-        tokenRecipient spender = tokenRecipient(_spender);
+        TokenRecipient spender = TokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
             return true;
@@ -126,7 +104,7 @@ contract HandsOnToken is owned {
     }
 }
 
-contract ExchangeOffice is owned {
+contract ExchangeOffice is Owned {
     uint256 public exchangeRate;
 
     HandsOnToken public exchangeToken;

@@ -20,4 +20,11 @@ describe('Compiler', () => {
 
     expect(contractMap).toMatchSnapshot();
   });
+
+  it('can compile a contract with imports', () => {
+    const compiler = new Compiler();
+    const contractMap = compiler.compile("../test/HandsOnToken.sol");
+
+    expect(contractMap).toMatchSnapshot();
+  });
 });

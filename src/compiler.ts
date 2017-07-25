@@ -14,6 +14,17 @@ type GasEstimates = {
   internal: { [method: string]: number },
 };
 
+type ImportDirective = {
+  path: string,
+  source: string,
+  match: string,
+  checksum: string,
+};
+
+type ImportMap = {
+  [importId: string]: string
+};
+
 type CompileOptions = {
   includeData?: boolean,
 };
@@ -94,42 +105,63 @@ export default class Compiler {
 
   private readFromCache(checksum: string): CompiledContractMap {
     try {
-      const rawData = fs.readFileSync(path.join(this.cacheDir, `${checksum}.json`));
+      const filePath = path.join(this.cacheDir, `${checksum}.json`);
+      const rawData = fs.readFileSync(filePath);
       return JSON.parse(rawData.toString());
     } catch(e) {
       return null;
     }
   }
 
-  private writeToCache(contents: any): string {
-    try {
-      const json = JSON.stringify(contents);
-      const checksum = this.getChecksum(json);
-      const filePath = path.join(this.cacheDir, `${checksum}.json`)
-      fs.writeFileSync(filePath, json);
-      return checksum;
-    } catch (e) {
-      return null;
+  private writeToCache(checksum: string, contents: any): string {
+    const json = JSON.stringify(contents);
+    const filePath = path.join(this.cacheDir, `${checksum}.json`)
+    fs.writeFileSync(filePath, json);
+    return checksum;
+  }
+
+  public buildImportList(contractPath: string, source: string): ImportDirective[] {
+    const importPattern = /import\s+("(.*)"|'(.*)');/ig;
+    const importList = [];
+    const basePath = path.dirname(contractPath);
+
+    let groups;
+
+    while (groups = importPattern.exec(source)) {
+      const relativePath = groups[2] || groups[3];
+      const importPath = path.resolve(basePath, relativePath);
+      const match = groups[0];
+      const source = fs.readFileSync(importPath).toString();
+      const checksum = this.getChecksum(source);
+
+      importList.push({
+        match,
+        source,
+        checksum,
+        path: importPath,
+      });
     }
+
+    return importList;
   }
 
   public compile(relativePath: string): CompiledContractMap {
-    const begin = Date.now();
-
     const [selfCall, fnCall] = callsite();
     const refPath = path.dirname(fnCall.getFileName());
     const contractPath = path.resolve(refPath, relativePath);
 
-    const source = fs.readFileSync(contractPath).toString();
+    let source: string = fs.readFileSync(contractPath).toString();
+    this.buildImportList(contractPath, source).forEach((importDirective) => {
+      source = source.replace(importDirective.match, importDirective.source);
+    });
+
     const checksum = this.getChecksum(source);
 
     const cacheEntry = this.readFromCache(checksum);
     if (cacheEntry) return cacheEntry;
 
     const compiledContractMap = Compiler.process(source);
-    this.writeToCache(compiledContractMap);
-
-    console.log('MEASURE', relativePath, Date.now() - begin);
+    this.writeToCache(checksum, compiledContractMap);
 
     return compiledContractMap;
   }
