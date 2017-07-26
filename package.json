@@ -32,7 +32,7 @@
     "nodemon": "^1.11.0",
     "rimraf": "^2.6.1",
     "solc": "^0.4.13",
-    "typescript": "^2.4.1",
+    "typescript": "^2.4.2",
     "web3": "^0.19.1"
   },
   "jest": {
@@ -60,14 +60,14 @@
     "@types/async": "^2.0.40",
     "@types/bignumber.js": "^4.0.2",
     "@types/callsite": "^1.0.30",
-    "@types/jest": "^20.0.4",
+    "@types/jest": "^20.0.5",
     "@types/memory-fs": "^0.3.0",
-    "@types/node": "^8.0.10",
+    "@types/node": "^8.0.17",
     "@types/webpack": "^3.0.5",
     "better-npm-run": "0.0.15",
     "memory-fs": "^0.4.1",
     "npm-run-all": "^4.0.2",
-    "prettier": "^1.5.2",
+    "prettier": "^1.5.3",
     "regenerator-runtime": "^0.10.5",
     "ts-jest": "^20.0.7"
   }

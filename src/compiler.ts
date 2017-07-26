@@ -81,16 +81,18 @@ export default class Compiler {
 
   public process(source: string, options?: CompileOptions): CompiledContractMap {
     const checksum = Compiler.getChecksum(source);
-    const cacheEntry = this.readFromCache(checksum);
-    if (cacheEntry) return cacheEntry;
+    let contracts = this.readFromCache(checksum);
 
-    // Only require when it's needed to shave some init time
-    if (!solc) solc = require('solc');
-    const result = solc.compile(source);
+    if (!contracts) {
+      // Only require when it's needed to shave some init time
+      if (!solc) solc = require('solc');
+      const result = solc.compile(source);
 
-    if (result.errors) throw new Error(result.errors);
+      if (result.errors) throw new Error(result.errors);
+      contracts = result.contracts;
+      this.writeToCache(checksum, contracts);
+    }
 
-    const { contracts } = result;
     const { includeData = true } = (options || {});
 
     const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
@@ -105,11 +107,10 @@ export default class Compiler {
       return Object.assign(acc, { [contractName]: compiledContract });
     }, {});
 
-    this.writeToCache(checksum, compiledContractMap);
     return compiledContractMap;
   }
 
-  private readFromCache(checksum: string): CompiledContractMap {
+  private readFromCache(checksum: string): any {
     try {
       const filePath = path.join(this.cacheDir, `${checksum}.json`);
       const rawData = fs.readFileSync(filePath);

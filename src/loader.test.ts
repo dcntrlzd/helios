@@ -15,7 +15,7 @@ afterEach(function() {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
 });
 
-function runWebpack(entry: string): Promise<any> {
+function runWebpack(entry: string, options: Object = {}): Promise<any> {
   return new Promise((resolve, reject) => {
     const fs = new MemoryFileSystem();
     const compiler: any = webpack({
@@ -27,7 +27,7 @@ function runWebpack(entry: string): Promise<any> {
         rules: [
            {
             test: /\.sol$/,
-            use: { loader: 'solist/loader' },
+            use: { loader: 'solist/loader', options },
            }
         ]
       },
@@ -54,11 +54,17 @@ it('compiles a basic solidity contract using the loader', () => {
   return runWebpack('../test/SimpleStorage.sol').then((info) => {
     expect(info.modules[0].source).toMatchSnapshot();
   });
-})
+});
+
+it('loader handles includeData compileOption', () => {
+  return runWebpack('../test/SimpleStorage.sol', { includeData: false }).then((info) => {
+    expect(info.modules[0].source).toMatchSnapshot();
+  });
+});
 
 it('compiles a solidity contract with imports using the loader', () => {
   return runWebpack('../test/HandsOnToken.sol').then((info) => {
     // TODO: check for file dependencies
     expect(info.modules[0].source).toMatchSnapshot();
   });
-})
+});
