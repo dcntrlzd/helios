@@ -1,13 +1,16 @@
 import Session from './session';
 import Compiler from './compiler';
+import Client from './client';
 
-let session = new Session();
-let compiler = new Compiler();
+const session = new Session();
+const compiler = new Compiler();
+const client = new Client(session.web3);
+const compile = compiler.compile.bind(compiler);
 
 declare const beforeEach: (any) => void;
 declare const afterEach: (any) => void;
 
-if (typeof beforeEach !== undefined && typeof afterEach !== undefined) {
+if (typeof beforeEach !== 'undefined' && typeof afterEach !== 'undefined') {
   let snapshotId;
 
   beforeEach(async () => {
@@ -19,10 +22,5 @@ if (typeof beforeEach !== undefined && typeof afterEach !== undefined) {
   });
 }
 
-export = {
-  compile: compiler.compile.bind(compiler),
-  deploy: session.deploy.bind(session),
-  client: session.client,
-  session,
-};
+export = { compile, client, session };
 

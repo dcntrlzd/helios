@@ -1,7 +1,6 @@
 import * as TestRPC from 'ethereumjs-testrpc';
 import * as Web3 from 'web3';
 import { CompiledContract, CompiledContractMap } from './compiler';
-import Client from './client';
 
 type SessionOptions = {
   logger: any,
@@ -17,7 +16,6 @@ type DeployOptions = {
 export default class Session {
   public provider: any;
   public web3: Web3;
-  public client: Client;
 
   public DEPLOYMENT_GAS = 3141592;
   public DEPLOYMENT_GAS_PRICE = 100000000000;
@@ -30,7 +28,6 @@ export default class Session {
     }
 
     this.web3 = new Web3(this.provider);
-    this.client = new Client(this.web3);
   }
 
   private send(method: string, ...params: any[]): Promise<any> {
@@ -42,28 +39,6 @@ export default class Session {
         if (!err) return resolve(res);
         reject(err);
       });
-    });
-  }
-
-  public deploy<C>(compiledContract: CompiledContract, options: DeployOptions = {}, ...args): Promise<Web3.Contract<C>> {
-    const { from, gas = this.DEPLOYMENT_GAS, gasPrice = this.DEPLOYMENT_GAS_PRICE } = options;
-    return new Promise<Web3.Contract<C>>((resolve, reject) => {
-      const { abi, data } = compiledContract;
-      const contract = this.web3.eth.contract<any>(abi);
-      const deployOptions = { data, gas, gasPrice };
-
-      if (from) Object.assign(deployOptions, { from });
-
-      const deployArguments = [
-        ...args,
-        deployOptions,
-        (err: any, res: Web3.Contract<C>) => {
-          if (err) return reject(err);
-          if (res.address) return resolve(res);
-        }
-      ];
-
-      contract.new(...deployArguments);
     });
   }
 
