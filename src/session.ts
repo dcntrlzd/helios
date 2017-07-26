@@ -1,24 +1,13 @@
 import * as TestRPC from 'ethereumjs-testrpc';
 import * as Web3 from 'web3';
-import { CompiledContract, CompiledContractMap } from './compiler';
 
 type SessionOptions = {
   logger: any,
 };
 
-type DeployOptions = {
-  contractName?: string,
-  from?: string,
-  gas?: number,
-  gasPrice?: number,
-};
-
 export default class Session {
   public provider: any;
   public web3: Web3;
-
-  public DEPLOYMENT_GAS = 3141592;
-  public DEPLOYMENT_GAS_PRICE = 100000000000;
 
   constructor(options?: SessionOptions) {
     if (process.env.TESTRPC_URL) {
