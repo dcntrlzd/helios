@@ -1,7 +1,7 @@
 const async = require('async');
 const eth = require('../src/runner.ts');
 
-it ('can run with async/await and solist/client', async () => {
+it ('can run with async/await and client', async () => {
   const { SimpleStorage } = await eth.compile('./SimpleStorage.sol');
 
   expect.assertions(2);

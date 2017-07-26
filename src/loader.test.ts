@@ -2,7 +2,7 @@ import * as webpack from 'webpack';
 import * as path from 'path';
 
 const MemoryFileSystem = require('memory-fs');
-const solistLoader = require('./loader');
+const heliosLoader = require('./loader');
 
 let originalTimeout;
 
@@ -27,14 +27,14 @@ function runWebpack(entry: string, options: Object = {}): Promise<any> {
         rules: [
            {
             test: /\.sol$/,
-            use: { loader: 'solist/loader', options },
+            use: { loader: '@dcntrlzd/helios/loader', options },
            }
         ]
       },
       resolveLoader: {
         extensions: ['.js', '.json', '.ts'],
         alias: {
-          'solist/loader': path.resolve(__dirname, './loader')
+          '@dcntrlzd/helios/loader': path.resolve(__dirname, './loader')
         }
       }
     });

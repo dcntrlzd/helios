@@ -47,7 +47,7 @@ type CompilerOptions = {
 let solc;
 
 export default class Compiler {
-  static TMP_NAME='solist';
+  static TMP_NAME='helios';
   cacheDir: string;
 
   constructor(options?: CompilerOptions) {

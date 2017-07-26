@@ -1,5 +1,5 @@
 {
-  "name": "solist",
+  "name": "helios",
   "version": "0.0.1",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
