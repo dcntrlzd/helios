@@ -7,25 +7,29 @@ import Compiler from './compiler';
 // Loader for Webpack
 function loader(source: string) {
   const options = loaderUtils.getOptions(this);
+  const compiler = new Compiler(options);
+  const callback = this.async();
 
-  const sourceWithImports = Compiler.buildImportList(source, (importPath) => {
-    const fullPath = path.resolve(this.context, importPath);
-    this.addDependency(fullPath);
-    // TODO: Use this.resolve/this.loadModule instead of readFile
-    // * https://webpack.js.org/development/how-to-write-a-loader/#resolve-dependencies
-    // * https://github.com/webpack-contrib/less-loader/blob/a3f9601c9439471f7f0ce9b4a59ba4cf9e178c43/src/createWebpackLessPlugin.js
-    // * https://webpack.js.org/api/loaders/#this-loadmodule
-
-    // const request = loaderUtils.urlToRequest(importPath, this.context);
-    // this.loadModule(fullPath, console.log);
-    // this.resolve(this.context, request);
-    return fs.readFileSync(fullPath).toString();
-  }).reduce((acc, importDirective) => {
-    return acc.replace(importDirective.match, importDirective.source)
-  }, source);
-
-  const data = Compiler.process(sourceWithImports, options);
-  return `module.exports = ${JSON.stringify(data)}`;
+  Compiler.resolveImports(source, (importPath) => {
+    return new Promise((resolve, reject) => {
+      this.resolve(this.context, importPath, (err, result) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        this.addDependency(result);
+        resolve(this.fs.readFileSync(result).toString());
+      });
+    });
+  }).then((importList) => {
+    let sourceWithImports = importList.reduce((acc, {match, source}) => {
+      return acc.replace(match, source);
+    }, source);
+    const data = compiler.process(sourceWithImports, options);
+    callback(null, `module.exports = ${JSON.stringify(data)}`);
+  }).catch((err) => {
+    callback(err);
+  });
 }
 
 export = loader;

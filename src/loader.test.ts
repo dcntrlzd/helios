@@ -19,6 +19,8 @@ function runWebpack(entry: string): Promise<any> {
   return new Promise((resolve, reject) => {
     const fs = new MemoryFileSystem();
     const compiler: any = webpack({
+      cache: true,
+      devtool: false,
       context: __dirname,
       entry,
       module: {

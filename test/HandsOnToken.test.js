@@ -2,7 +2,7 @@ const async = require('async');
 const fs = require('fs');
 const eth = require('../src/runner');
 
-const { HandsOnToken, ExchangeOffice } = eth.compile('./HandsOnToken.sol');
+
 
 const INITIAL_SUPPLY = 10000;
 const DECIMALS = 2;
@@ -10,6 +10,7 @@ const ETH_TO_WEI = 1000000000000000000;
 
 describe('HandsOnToken', () => {
   it('Creates the token', async () => {
+    const { HandsOnToken, ExchangeOffice } = await eth.compile('./HandsOnToken.sol');
     const [account] = await eth.client.getAccounts();
     eth.client.setCurrentAccount(account);
 
@@ -24,6 +25,7 @@ describe('HandsOnToken', () => {
 
 describe('ExchangeOffice', () => {
   it('Creates the contract and exchanges ETH for HOT', async () => {
+    const { HandsOnToken, ExchangeOffice } = await eth.compile('./HandsOnToken.sol');
     const accounts = await eth.client.getAccounts();
 
     const [account, testAccount] = accounts;

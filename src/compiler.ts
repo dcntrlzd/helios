@@ -14,12 +14,12 @@ type GasEstimates = {
   internal: { [method: string]: number },
 };
 
-type ImportResolver = (importPath: string) => string;
+type ImportResolver = (importPath: string) => Promise<string>;
 
 type ImportDirective = {
   path: string,
-  source: string,
   match: string,
+  source: string,
 };
 
 type ImportMap = {
@@ -79,7 +79,11 @@ export default class Compiler {
       .toString();
   }
 
-  public static process(source: string, options?: CompileOptions): CompiledContractMap {
+  public process(source: string, options?: CompileOptions): CompiledContractMap {
+    const checksum = Compiler.getChecksum(source);
+    const cacheEntry = this.readFromCache(checksum);
+    if (cacheEntry) return cacheEntry;
+
     // Only require when it's needed to shave some init time
     if (!solc) solc = require('solc');
     const result = solc.compile(source);
@@ -101,6 +105,7 @@ export default class Compiler {
       return Object.assign(acc, { [contractName]: compiledContract });
     }, {});
 
+    this.writeToCache(checksum, compiledContractMap);
     return compiledContractMap;
   }
 
@@ -121,55 +126,61 @@ export default class Compiler {
     return checksum;
   }
 
-  private buildImportResolver(contractPath: string): ImportResolver {
+  private buildFSResolver(contractPath: string): ImportResolver {
     const basePath = path.dirname(contractPath);
     return (importPath: string) => {
-      const filePath = path.resolve(basePath, importPath);
-      return fs.readFileSync(filePath).toString();
+      return new Promise((resolve, reject) => {
+        const filePath = path.resolve(basePath, importPath);
+        fs.readFile(filePath, (err, fileContents) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve(fileContents.toString());
+        })
+      });
     }
   }
 
-  public static buildImportList(source: string, importResolver: ImportResolver): ImportDirective[] {
+  public static async resolveImports(source: string, importResolver: ImportResolver): Promise<ImportDirective[]> {
     const importPattern = /import\s+("(.*)"|'(.*)');/ig;
     const importList = [];
+    const resolvers = [];
 
     let groups;
 
     while (groups = importPattern.exec(source)) {
       const importPath = groups[2] || groups[3];
       const match = groups[0];
-      const source = importResolver(importPath);
 
-      importList.push({
-        match,
-        source,
-        path: importPath,
-      });
+      resolvers.push(importResolver(importPath).then((source) => {
+        importList.push({
+          match,
+          source,
+          path: importPath,
+        });
+      }));
     }
+
+    await Promise.all(resolvers);
 
     return importList;
   }
 
-  public compile(relativePath: string): CompiledContractMap {
+  public async compile(relativePath: string, importResolver?: ImportResolver): Promise<CompiledContractMap> {
     const [selfCall, fnCall] = callsite();
     const refPath = path.dirname(fnCall.getFileName());
     const contractPath = path.resolve(refPath, relativePath);
 
     let source: string = fs.readFileSync(contractPath).toString();
-    let importResolver = this.buildImportResolver(contractPath);
+    if (!importResolver) importResolver = this.buildFSResolver(contractPath);
 
-    Compiler.buildImportList(source, importResolver).forEach((importDirective) => {
-      source = source.replace(importDirective.match, importDirective.source);
-    });
+    const importList = await Compiler.resolveImports(source, importResolver);
 
-    const checksum = Compiler.getChecksum(source);
+    const sourceWithImports = importList.reduce((acc, { match, source }) => {
+      return acc.replace(match, source);
+    }, source);
 
-    const cacheEntry = this.readFromCache(checksum);
-    if (cacheEntry) return cacheEntry;
-
-    const compiledContractMap = Compiler.process(source);
-    this.writeToCache(checksum, compiledContractMap);
-
-    return compiledContractMap;
+    return this.process(sourceWithImports);
   }
 }

@@ -1,4 +1,3 @@
-import * as jasmine2 from 'jest-jasmine2';
 import Session from './session';
 import Compiler from './compiler';
 
