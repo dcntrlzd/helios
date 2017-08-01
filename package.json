@@ -20,20 +20,12 @@
     "parser": "typescript"
   },
   "dependencies": {
-    "async": "^2.5.0",
     "bignumber.js": "^4.0.2",
     "callsite": "^1.0.0",
-    "ethereumjs-testrpc": "^4.0.1",
     "glob": "^7.1.2",
-    "jest": "^20.0.4",
-    "jest-jasmine2": "^20.0.4",
     "loader-utils": "^1.1.0",
-    "memorystream": "^0.3.1",
     "mkdirp": "^0.5.1",
-    "nodemon": "^1.11.0",
-    "rimraf": "^2.6.1",
     "solc": "^0.4.13",
-    "typescript": "^2.4.2",
     "web3": "^0.19.1"
   },
   "jest": {
@@ -71,6 +63,12 @@
     "prettier": "^1.5.3",
     "regenerator-runtime": "^0.10.5",
     "ts-jest": "^20.0.7",
-    "tslint": "^5.5.0"
+    "tslint": "^5.5.0",
+    "ethereumjs-testrpc": "^4.0.1",
+    "jest": "^20.0.4",
+    "jest-jasmine2": "^20.0.4",
+    "nodemon": "^1.11.0",
+    "typescript": "^2.4.2",
+    "async": "^2.5.0"
   }
 }
