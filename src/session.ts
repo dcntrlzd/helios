@@ -5,13 +5,21 @@ type SessionOptions = {
   logger: any,
 };
 
+// TODO: Refactor to be a basic utility for providing a provider instance and a compiler
+
 export default class Session {
   public provider: any;
   public web3: Web3;
 
   constructor(options?: SessionOptions) {
-    if (process.env.TESTRPC_URL) {
-       this.provider = new Web3.providers.HttpProvider(process.env.TESTRPC_URL);
+    // TODO: create a state instance
+    // TODO: proxy setState/getState methods with networkId param
+    // TODO: create a compiler instance (private)
+    // TODO: proxy compile method
+    // TODO: create a client instance (private)
+
+    if (process.env.HELIOS_NODE_URL) {
+       this.provider = new Web3.providers.HttpProvider(process.env.HELIOS_NODE_URL);
     } else {
       this.provider = TestRPC.provider(options);
     }

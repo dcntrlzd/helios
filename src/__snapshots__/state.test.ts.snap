@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`can create a new state instance 1`] = `"{}"`;
+
+exports[`can persist state modifications 1`] = `"{}"`;
+
+exports[`can persist state modifications 2`] = `"{\\"420\\":{\\"version\\":0}}"`;
+
+exports[`can persist state modifications 3`] = `
+Object {
+  "version": 0,
+}
+`;
+
+exports[`can preload a previously persisted state 1`] = `
+Object {
+  "hello": "world",
+}
+`;

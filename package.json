@@ -40,7 +40,6 @@
     "testEnvironment": "node",
     "moduleFileExtensions": [
       "js",
-      "json",
       "ts",
       "node",
       "sol"
@@ -60,6 +59,7 @@
     "@types/async": "^2.0.40",
     "@types/bignumber.js": "^4.0.2",
     "@types/callsite": "^1.0.30",
+    "@types/glob": "^5.0.30",
     "@types/jest": "^20.0.5",
     "@types/memory-fs": "^0.3.0",
     "@types/node": "^8.0.17",

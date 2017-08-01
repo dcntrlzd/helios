@@ -2,8 +2,6 @@ const async = require('async');
 const fs = require('fs');
 const eth = require('../src/runner');
 
-
-
 const INITIAL_SUPPLY = 10000;
 const DECIMALS = 2;
 const ETH_TO_WEI = 1000000000000000000;

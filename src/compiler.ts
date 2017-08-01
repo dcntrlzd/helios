@@ -5,7 +5,6 @@ import * as path from 'path';
 import * as crypto from 'crypto';
 import * as Web3 from 'web3';
 import * as mkdirp from 'mkdirp';
-import * as glob from 'glob';
 import * as callsite from 'callsite';
 
 type GasEstimates = {
