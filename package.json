@@ -4,6 +4,7 @@
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
+    "lint": "tslint -p . --fix",
     "testrpc": "better-npm-run testrpc",
     "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch",
     "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write"
@@ -69,6 +70,7 @@
     "npm-run-all": "^4.0.2",
     "prettier": "^1.5.3",
     "regenerator-runtime": "^0.10.5",
-    "ts-jest": "^20.0.7"
+    "ts-jest": "^20.0.7",
+    "tslint": "^5.5.0"
   }
 }

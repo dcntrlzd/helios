@@ -1,6 +1,6 @@
+import * as fs from 'fs';
 import * as loaderUtils from 'loader-utils';
 import * as path from 'path';
-import * as fs from 'fs';
 
 import Compiler from './compiler';
 
@@ -22,8 +22,8 @@ function loader(source: string) {
       });
     });
   }).then((importList) => {
-    let sourceWithImports = importList.reduce((acc, {match, source}) => {
-      return acc.replace(match, source);
+    const sourceWithImports = importList.reduce((acc, {match, source: importSource}) => {
+      return acc.replace(match, importSource);
     }, source);
     const data = compiler.process(sourceWithImports, options);
     callback(null, `module.exports = ${JSON.stringify(data)}`);

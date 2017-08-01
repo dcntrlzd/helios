@@ -1,49 +1,54 @@
-import * as webpack from 'webpack';
 import * as path from 'path';
-
-const MemoryFileSystem = require('memory-fs');
-const heliosLoader = require('./loader');
+import * as webpack from 'webpack';
+import MemoryFileSystem = require('memory-fs');
+import heliosLoader = require('./loader');
 
 let originalTimeout;
 
-beforeEach(function() {
+beforeEach(() => {
   originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
   jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 5 * 1000;
 });
 
-afterEach(function() {
+afterEach(() => {
   jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
 });
 
-function runWebpack(entry: string, options: Object = {}): Promise<any> {
+function runWebpack(entry: string, options: object = {}): Promise<any> {
   return new Promise((resolve, reject) => {
     const fs = new MemoryFileSystem();
     const compiler: any = webpack({
       cache: true,
-      devtool: false,
       context: __dirname,
+      devtool: false,
       entry,
       module: {
         rules: [
            {
             test: /\.sol$/,
             use: { loader: '@dcntrlzd/helios/loader', options },
-           }
-        ]
+           },
+        ],
       },
       resolveLoader: {
-        extensions: ['.js', '.json', '.ts'],
         alias: {
-          '@dcntrlzd/helios/loader': path.resolve(__dirname, './loader')
-        }
-      }
+          '@dcntrlzd/helios/loader': path.resolve(__dirname, './loader'),
+        },
+        extensions: ['.js', '.json', '.ts'],
+      },
     });
     compiler.outputFileSystem = fs;
     compiler.run((err, stats) => {
-      if (err) return reject(err);
+      if (err) {
+        reject(err);
+        return;
+      }
 
       const info = stats.toJson();
-      if (stats.hasErrors()) return reject(info.errors);
+      if (stats.hasErrors()) {
+        reject(info.errors);
+        return;
+      }
 
       resolve(info);
     });

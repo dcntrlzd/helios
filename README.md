@@ -45,7 +45,6 @@ Loosely opinionated solidity contract development library.
 ```
 
 ## TODO
-* add tslint
 * detailed documentation
 * complete tests
 * Refactor file structure of the package

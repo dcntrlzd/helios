@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 
 export default class State {
-  private state: Object;
+  private state: object;
   private statePath: string;
 
   constructor(statePath: string) {
@@ -16,17 +16,17 @@ export default class State {
     this.persist();
   }
 
-  private persist() {
-    fs.writeFileSync(this.statePath, JSON.stringify(this.state));
-  }
-
-  public getState(networkId: any): Object {
+  public getState(networkId: any): object {
     return this.state[networkId.toString()] || {};
   }
 
-  public setState(networkId: any, state: Object): void {
+  public setState(networkId: any, state: object): void {
     const networkState = this.getState(networkId);
     this.state[networkId.toString()] = Object.assign(networkState, state);
     this.persist();
+  }
+
+  private persist() {
+    fs.writeFileSync(this.statePath, JSON.stringify(this.state));
   }
 }

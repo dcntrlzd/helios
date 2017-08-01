@@ -1,6 +1,6 @@
-import Session from './session';
-import Compiler from './compiler';
 import Client from './client';
+import Compiler from './compiler';
+import Session from './session';
 
 const session = new Session();
 const compiler = new Compiler();
@@ -18,9 +18,10 @@ if (typeof beforeEach !== 'undefined' && typeof afterEach !== 'undefined') {
   });
 
   afterEach(async () => {
-    if (snapshotId) await session.revert(snapshotId);
+    if (snapshotId) {
+      await session.revert(snapshotId);
+    }
   });
 }
 
 export = { compile, client, session };
-

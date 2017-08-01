@@ -1,24 +1,22 @@
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
 
 import State from './state';
 
 const STATE_PATH = path.resolve(__dirname, '../state.json');
 
 beforeEach(() => {
-  try {
+  if (fs.statSync(STATE_PATH)) {
     fs.unlinkSync(STATE_PATH);
-  } catch (e) {
-
   }
-})
+});
 
 it('can create a new state instance', () => {
   const state = new State(STATE_PATH);
   expect(fs.readFileSync(STATE_PATH).toString()).toMatchSnapshot();
 });
 
-it('can persist state modifications',async () => {
+it('can persist state modifications', async () => {
   const state = new State(STATE_PATH);
   expect(fs.readFileSync(STATE_PATH).toString()).toMatchSnapshot();
   state.setState(420, { version: 0 });

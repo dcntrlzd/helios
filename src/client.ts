@@ -1,82 +1,80 @@
-import * as Web3 from 'web3';
 import { BigNumber } from 'bignumber.js';
-import { CompiledContract } from './compiler';
+import * as Web3 from 'web3';
+import { ICompiledContract } from './compiler';
 
 type BlockID = string | number;
 
-type SyncObject = {
-  startingBlock: number,
-  currentBlock: number,
-  highestBlock: number,
-};
+interface ISyncObject {
+  startingBlock: number;
+  currentBlock: number;
+  highestBlock: number;
+}
 
-type Transaction = {
-  hash: string,
-  nonce: number,
-  blockHash: string,
-  blockNumber: number,
-  transactionIndex: number,
-  from: string,
-  to: string,
-  value: BigNumber,
-  gasPrice: BigNumber,
-  gas: number,
-  input: string,
-};
+interface ITransaction {
+  hash: string;
+  nonce: number;
+  blockHash: string;
+  blockNumber: number;
+  transactionIndex: number;
+  from: string;
+  to: string;
+  value: BigNumber;
+  gasPrice: BigNumber;
+  gas: number;
+  input: string;
+}
 
-type TransactionReceipt = {
-  blockHash: string,
-  blockNumber: number,
-  transactionHash: string,
-  transactionIndex: number,
-  from: string,
-  to: string,
-  cumulativeGasUsed: number,
-  gasUsed: number,
-  contractAddress: string,
-  logs: any[],
-};
+interface ITransactionReceipt {
+  blockHash: string;
+  blockNumber: number;
+  transactionHash: string;
+  transactionIndex: number;
+  from: string;
+  to: string;
+  cumulativeGasUsed: number;
+  gasUsed: number;
+  contractAddress: string;
+  logs: any[];
+}
 
-type Block = {
-  number: number,
-  hash: string,
-  parentHash: string,
-  nonce: string,
-  sha3Uncles: string,
-  logsBloom: string,
-  transactionsRoot: string,
-  stateRoot: string,
-  miner: string,
-  difficulty: BigNumber,
-  totalDifficulty: BigNumber,
-  extraData: string,
-  size: number,
-  gasLimit: number,
-  gasUsed: number,
-  timestamp: number,
-  transactions: Transaction[],
-  uncles: Block[],
-};
+interface IBlock {
+  number: number;
+  hash: string;
+  parentHash: string;
+  nonce: string;
+  sha3Uncles: string;
+  logsBloom: string;
+  transactionsRoot: string;
+  stateRoot: string;
+  miner: string;
+  difficulty: BigNumber;
+  totalDifficulty: BigNumber;
+  extraData: string;
+  size: number;
+  gasLimit: number;
+  gasUsed: number;
+  timestamp: number;
+  transactions: ITransaction[];
+  uncles: IBlock[];
+}
 
-type DeployOptions = {
-  contractName?: string,
-  from?: string,
-  gas?: number,
-  gasPrice?: number,
-  args?: any[],
-};
+interface IDeployOptions {
+  contractName?: string;
+  from?: string;
+  gas?: number;
+  gasPrice?: number;
+  args?: any[];
+}
 
 export default class Client {
-  private web3: Web3;
-
   public METHOD_PATTERN = /^(get|is|send|sign|call)([A-Z].*)?$/;
   public DEPLOYMENT_GAS = 3141592;
   public DEPLOYMENT_GAS_PRICE = 100000000000;
 
   // API for typescript:
   // wrapped web3.eth methods matching METHOD_PATTERN
-  public getSyncing: () => Promise<boolean | SyncObject>;
-  public isSyncing: () => Promise<boolean | SyncObject>;
+  public getSyncing: () => Promise<boolean | ISyncObject>;
+  public isSyncing: () => Promise<boolean | ISyncObject>;
   public getCoinbase: () => Promise<string>;
   public getHashrate: () => Promise<number>;
   public getGasPrice: () => Promise<BigNumber>;
@@ -86,19 +84,21 @@ export default class Client {
   public getBalance: (address: string) => Promise<BigNumber>;
   public getStorageAt: (address: string, position: number) => Promise<string>;
   public getCode: (address: string) => Promise<string>;
-  public getBlock: (hashOrNumber: BlockID, returnTransactionObjects?: boolean) => Promise<Block>;
+  public getBlock: (hashOrNumber: BlockID, returnTransactionObjects?: boolean) => Promise<IBlock>;
   public getBlockTransactionCount: (hashOrNumber: BlockID) => Promise<number>;
-  public getUncle: (hashOrNumber: BlockID, returnTransactionObjects?: boolean) => Promise<Block>;
+  public getUncle: (hashOrNumber: BlockID, returnTransactionObjects?: boolean) => Promise<IBlock>;
   public getBlockUncleCount: (hashOrNumber: BlockID) => Promise<number>;
-  public getTransaction: (hash: string) => Promise<Transaction>;
-  public getTransactionFromBlock: (hashOrNumber: BlockID, indexNumber: number) => Promise<Transaction>;
-  public getTransactionReceipt: (hash: string) => Promise<TransactionReceipt>;
+  public getTransaction: (hash: string) => Promise<ITransaction>;
+  public getTransactionFromBlock: (hashOrNumber: BlockID, indexNumber: number) => Promise<ITransaction>;
+  public getTransactionReceipt: (hash: string) => Promise<ITransactionReceipt>;
   public getTransactionCount: (address: string) => Promise<number>;
   public sendTransaction: (object) => Promise<string>;
   public sendRawTransaction: (object) => Promise<string>;
   public sign: (object) => Promise<string>;
   public call: (object) => Promise<string>;
   public estimateGas: (object) => Promise<number>;
+
+  private web3: Web3;
 
   constructor(web3: Web3) {
     this.web3 = web3;
@@ -107,7 +107,9 @@ export default class Client {
       return this.METHOD_PATTERN.test(methodName);
     }).forEach((methodName) => {
       const method = this.web3.eth[methodName];
-      if (!method) throw new Error(`${methodName} method not found in the supplied web3 client.`);
+      if (!method) {
+        throw new Error(`${methodName} method not found in the supplied web3 client.`);
+      }
 
       this[methodName] = this.promisify(method, this.web3.eth);
     });
@@ -121,7 +123,10 @@ export default class Client {
     this.web3.eth.defaultAccount = account;
   }
 
-  public defineContract<C>(compiledContract: CompiledContract, address: string): Promise<Web3.Contract<C>> {
+  public defineContract<C>(
+    compiledContract: ICompiledContract,
+    address: string,
+  ): Promise<Web3.Contract<C>> {
     return new Promise<Web3.Contract<C>>((resolve, reject) => {
       const { abi, data } = compiledContract;
       const contract = this.web3.eth.contract<any>(abi);
@@ -129,12 +134,15 @@ export default class Client {
     });
   }
 
-  public deployContract<C>(compiledContract: CompiledContract, options: DeployOptions = {}): Promise<Web3.Contract<C>> {
+  public deployContract<C>(
+    compiledContract: ICompiledContract,
+    options: IDeployOptions = {},
+  ): Promise<Web3.Contract<C>> {
     const {
       from,
       args = [],
       gas = this.DEPLOYMENT_GAS,
-      gasPrice = this.DEPLOYMENT_GAS_PRICE
+      gasPrice = this.DEPLOYMENT_GAS_PRICE,
     } = options;
 
     return new Promise<Web3.Contract<C>>((resolve, reject) => {
@@ -142,15 +150,22 @@ export default class Client {
       const contract = this.web3.eth.contract<any>(abi);
       const deployOptions = { data, gas, gasPrice };
 
-      if (from) Object.assign(deployOptions, { from });
+      if (from) {
+        Object.assign(deployOptions, { from });
+      }
 
       const deployArguments = [
         ...args,
         deployOptions,
-        (err: any, res: Web3.Contract<C>) => {
-          if (err) return reject(err);
-          if (res.address) return resolve(this.promisifyContract(res));
-        }
+        (err: any, res: Web3.Contract<C>): void => {
+          if (err) {
+            reject(err);
+            return;
+          } else if (res.address) {
+            resolve(this.promisifyContract(res));
+            return ;
+          }
+        },
       ];
 
       contract.new(...deployArguments);
@@ -163,7 +178,9 @@ export default class Client {
     contract.abi.forEach((abiItem: Web3.AbiDefinition) => {
       const { name } = abiItem;
       const method = contract[name];
-      if (!method) return;
+      if (!method) {
+        return;
+      }
 
       contract[name] = this.promisify(method, contract);
     });
@@ -180,10 +197,9 @@ export default class Client {
            return;
          }
          resolve(result);
-      }
+      };
 
       boundMethod(...baseArgs.concat([callback]));
     });
   }
 }
-
