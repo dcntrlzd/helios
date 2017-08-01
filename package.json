@@ -6,19 +6,13 @@
   "scripts": {
     "lint": "tslint -p . --fix",
     "testrpc": "better-npm-run testrpc",
-    "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch",
-    "format": "prettier --trailing-comma es5 --parser typescript --single-quote true --print-width 100 ./engine/**/*.ts ./engine/**/*.ts --write"
+    "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch"
   },
   "betterScripts": {
     "testrpc": "testrpc -m \"$TESTRPC_MNEMONIC\""
   },
   "author": "",
   "license": "ISC",
-  "prettier": {
-    "printWidth": 100,
-    "singleQuote": true,
-    "parser": "typescript"
-  },
   "dependencies": {
     "bignumber.js": "^4.0.2",
     "callsite": "^1.0.0",
@@ -38,7 +32,7 @@
       "sol"
     ],
     "transform": {
-      "^.+\\.(ts)$": "<rootDir>/tooling/ts-preprocessor.js"
+      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
     },
     "testMatch": [
       "**/__tests__/**/*.[tj]s",
