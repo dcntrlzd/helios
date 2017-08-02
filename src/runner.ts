@@ -4,7 +4,6 @@ import Session from './session';
 
 const session = new Session();
 const compiler = new Compiler();
-const client = new Client(session.web3);
 const compile = compiler.compile.bind(compiler);
 
 declare const beforeEach: (any) => void;
@@ -12,6 +11,8 @@ declare const afterEach: (any) => void;
 
 if (typeof beforeEach !== 'undefined' && typeof afterEach !== 'undefined') {
   let snapshotId;
+
+  beforeAll(() => session.promise);
 
   beforeEach(async () => {
     snapshotId = await session.snapshot();
@@ -24,4 +25,4 @@ if (typeof beforeEach !== 'undefined' && typeof afterEach !== 'undefined') {
   });
 }
 
-export = { compile, client, session };
+export = session;

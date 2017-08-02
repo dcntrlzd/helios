@@ -1,15 +1,15 @@
 const async = require('async');
-const eth = require('../src/runner.ts');
+const helios = require('../src/runner.ts');
 
 it ('can run with async/await and client', async () => {
-  const { SimpleStorage } = await eth.compile('./SimpleStorage.sol');
+  const { SimpleStorage } = await helios.compile('./SimpleStorage.sol');
 
   expect.assertions(2);
 
-  const [account] = await eth.client.getAccounts()
-  eth.client.setCurrentAccount(account);
+  const [account] = await helios.client.getAccounts()
+  helios.client.setCurrentAccount(account);
 
-  const contract = await eth.client.deployContract(SimpleStorage);
+  const contract = await helios.client.deployContract(SimpleStorage);
 
   expect((await contract.get()).toNumber()).toBe(0);
   await contract.set(10);
@@ -17,10 +17,10 @@ it ('can run with async/await and client', async () => {
 });
 
 it('stores & retrieves the value with web3 fully', (done) => {
-  const { web3 } = eth.session
+  const { web3 } = helios.client
   async.waterfall([
     (callback) => {
-      eth.compile('./SimpleStorage.sol').then(({ SimpleStorage }) => {
+      helios.compile('./SimpleStorage.sol').then(({ SimpleStorage }) => {
         callback(null, SimpleStorage)
       })
     },

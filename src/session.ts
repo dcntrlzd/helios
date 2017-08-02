@@ -1,30 +1,72 @@
 import * as TestRPC from 'ethereumjs-testrpc';
 import * as Web3 from 'web3';
 
+import Client from './client';
+import Compiler from './compiler';
+import State from './state';
+
 interface ISessionOptions {
-  logger: any;
+  statePath?: string;
+  provider?: any;
 }
 
-// TODO: Refactor to be a basic utility for providing a provider instance and a compiler
-
 export default class Session {
-  public provider: any;
-  public web3: Web3;
+  public static create(options: ISessionOptions): Promise<Session> {
+    return new Promise((resolve) => new Session(options, resolve));
+  }
 
-  constructor(options?: ISessionOptions) {
-    // TODO: create a state instance
-    // TODO: proxy setState/getState methods with networkId param
-    // TODO: create a compiler instance (private)
-    // TODO: proxy compile method
-    // TODO: create a client instance (private)
+  public client: Client;
+  public promise: Promise<any>;
+  public compile: (path: string) => Promise<any>;
 
-    if (process.env.HELIOS_NODE_URL) {
-       this.provider = new Web3.providers.HttpProvider(process.env.HELIOS_NODE_URL);
+  private provider: any;
+  private state: State;
+  private compiler: Compiler;
+  private networkId: number;
+
+  public constructor(options: ISessionOptions = {}, callback?: (Session) => void) {
+    const { provider, statePath } = options;
+
+    if (provider) {
+      this.provider = provider;
+    } else if (process.env.HELIOS_NODE_URL) {
+      this.provider = new Web3.providers.HttpProvider(process.env.HELIOS_NODE_URL);
     } else {
       this.provider = TestRPC.provider(options);
     }
 
-    this.web3 = new Web3(this.provider);
+    this.client = new Client(this.provider);
+    this.state = new State(statePath);
+
+    this.compiler = new Compiler();
+    this.compile = this.compiler.compile.bind(this.compiler);
+
+    this.promise = new Promise((resolve) => {
+      this.client.web3.version.getNetwork((error, networkId) => {
+        if (error) {
+          throw new Error('Cannot fetch network id');
+        }
+        this.networkId = networkId;
+        if (callback) {
+          callback(this);
+        }
+        resolve();
+      });
+    });
+  }
+
+  public getState(): object {
+    if (!this.networkId) {
+      throw new Error('Cannot read state before networkId is set');
+    }
+    return this.state.getState(this.networkId);
+  }
+
+  public setState(state: object) {
+    if (!this.networkId) {
+      throw new Error('Cannot write state before networkId is set');
+    }
+    this.state.setState(this.networkId, state);
   }
 
   public snapshot(): Promise<any> {
@@ -52,7 +94,7 @@ export default class Session {
     }
 
     return new Promise((resolve, reject) => {
-      this.web3.currentProvider.sendAsync(payload, (err, res) => {
+      this.provider.sendAsync(payload, (err, res) => {
         if (!err) {
           resolve(res);
           return;

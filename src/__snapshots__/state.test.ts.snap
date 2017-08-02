@@ -14,6 +14,12 @@ Object {
 
 exports[`can preload a previously persisted state 1`] = `
 Object {
-  "hello": "world",
+  "version": 0,
+}
+`;
+
+exports[`does not persists if no state path is given 1`] = `
+Object {
+  "version": 0,
 }
 `;

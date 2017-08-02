@@ -4,16 +4,20 @@ export default class State {
   private state: object;
   private statePath: string;
 
-  constructor(statePath: string) {
+  constructor(statePath?: string) {
     this.statePath = statePath;
 
-    try {
-      const rawState = fs.readFileSync(statePath);
-      this.state = JSON.parse(rawState.toString());
-    } catch (e) {
+    if (this.statePath) {
+      try {
+        const rawState = fs.readFileSync(statePath);
+        this.state = JSON.parse(rawState.toString());
+      } catch (e) {
+        this.state = {};
+      }
+      this.persist();
+    } else {
       this.state = {};
     }
-    this.persist();
   }
 
   public getState(networkId: any): object {
@@ -27,6 +31,8 @@ export default class State {
   }
 
   private persist() {
-    fs.writeFileSync(this.statePath, JSON.stringify(this.state));
+    if (this.statePath) {
+      fs.writeFileSync(this.statePath, JSON.stringify(this.state));
+    }
   }
 }

@@ -98,10 +98,10 @@ export default class Client {
   public call: (object) => Promise<string>;
   public estimateGas: (object) => Promise<number>;
 
-  private web3: Web3;
+  public web3: Web3;
 
-  constructor(web3: Web3) {
-    this.web3 = web3;
+  constructor(provider: any) {
+    this.web3 = new Web3(provider);
 
     Object.keys(this.web3.eth).filter((methodName) => {
       return this.METHOD_PATTERN.test(methodName);
