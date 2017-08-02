@@ -1,6 +1,6 @@
 const async = require('async');
 const fs = require('fs');
-const helios = require('../src/runner');
+const helios = require('../../src/runner');
 
 const INITIAL_SUPPLY = 10000;
 const DECIMALS = 2;

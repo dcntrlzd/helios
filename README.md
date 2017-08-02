@@ -17,7 +17,7 @@ Loosely opinionated solidity contract development library.
   * Deployment functions might become a new component called deployer
 * loader (done)
   * Webpack loader for reading sol files
-* state/migrations (not there yet)
+* state/migrations (done)
   * Runs the migrations code
   * Provides an interface for storing the state as configs
   * Such as the address of your migration/manager script
@@ -47,13 +47,9 @@ Loosely opinionated solidity contract development library.
 ## TODO
 * detailed documentation
 * complete tests
-* Refactor file structure of the package
-  * Move every test related file (migrations/state/contracts) to the test directory
-* App wide state/config storage (for storing contract addresses etc.)
-  * might be a json
 
 ## Nice to Have
-* prettier for state serialization to make it version control friendly.
+* prettier for state serialization to make it version control friendly (will require json to js switch);
 * cache the engine instance between runtimes to save some time (depends on the test runner configuration).
 * use step handler of the vm to debug the contract.
   * Reading states etc. inside the steps.

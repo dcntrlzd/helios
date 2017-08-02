@@ -3,9 +3,9 @@ import * as path from 'path';
 
 import State from './state';
 
-const STATE_PATH = path.resolve(__dirname, '../state.json');
+const STATE_PATH = path.resolve(__dirname, '../test/state.json');
 
-beforeEach(() => {
+afterEach(() => {
   if (fs.existsSync(STATE_PATH)) {
     fs.unlinkSync(STATE_PATH);
   }
