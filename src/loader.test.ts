@@ -3,17 +3,6 @@ import * as webpack from 'webpack';
 import MemoryFileSystem = require('memory-fs');
 import heliosLoader = require('./loader');
 
-let originalTimeout;
-
-beforeEach(() => {
-  originalTimeout = jasmine.DEFAULT_TIMEOUT_INTERVAL;
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60 * 5 * 1000;
-});
-
-afterEach(() => {
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = originalTimeout;
-});
-
 function runWebpack(entry: string, options: object = {}): Promise<any> {
   return new Promise((resolve, reject) => {
     const fs = new MemoryFileSystem();

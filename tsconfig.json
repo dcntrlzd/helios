@@ -10,5 +10,9 @@
     "./types/web3-typescript-typings/index.d.ts",
     "./node_modules/@types/jest/index.d.ts",
     "./src/**/*.ts"
+  ],
+  "exclude": [
+    "./src/__snapshots__/**/*",
+    "./src/**/*.test.ts"
   ]
 }

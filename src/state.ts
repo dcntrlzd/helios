@@ -1,15 +1,20 @@
 import * as fs from 'fs';
 
+export interface IStateOptions {
+  path?: string;
+}
+
 export default class State {
   private state: object;
-  private statePath: string;
+  private path: string;
 
-  constructor(statePath?: string) {
-    this.statePath = statePath;
+  constructor(options: IStateOptions = {}) {
+    const { path } = options;
+    this.path = path;
 
-    if (this.statePath) {
+    if (this.path) {
       try {
-        const rawState = fs.readFileSync(statePath);
+        const rawState = fs.readFileSync(path);
         this.state = JSON.parse(rawState.toString());
       } catch (e) {
         this.state = {};
@@ -31,8 +36,8 @@ export default class State {
   }
 
   private persist() {
-    if (this.statePath) {
-      fs.writeFileSync(this.statePath, JSON.stringify(this.state));
+    if (this.path) {
+      fs.writeFileSync(this.path, JSON.stringify(this.state));
     }
   }
 }

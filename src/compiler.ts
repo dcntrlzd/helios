@@ -35,7 +35,7 @@ export interface ICompiledContractMap {
   [contractName: string]: ICompiledContract;
 }
 
-interface ICompilerOptions {
+export interface ICompilerOptions {
   cacheDir?: string;
 }
 
@@ -81,9 +81,9 @@ export default class Compiler {
 
   public cacheDir: string;
 
-  constructor(options?: ICompilerOptions) {
-    const cacheDir = (options && options.cacheDir) ? options.cacheDir : this.defaultCacheDir();
-    this.cacheDir = cacheDir;
+  constructor(options: ICompilerOptions = {}) {
+    const { cacheDir } = options;
+    this.cacheDir = cacheDir ? cacheDir : this.defaultCacheDir();
 
     // create the cacheDir if not present or accessible
     try {

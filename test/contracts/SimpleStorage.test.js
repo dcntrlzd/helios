@@ -1,5 +1,5 @@
 const async = require('async');
-const helios = require('../../src/runner');
+const helios = require('../runner');
 
 it ('can run with async/await and client', async () => {
   const { SimpleStorage } = await helios.compile('./SimpleStorage.sol');

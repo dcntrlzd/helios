@@ -115,6 +115,14 @@ export default class Client {
     });
   }
 
+  public isConnected(): string {
+    return this.web3.isConnected();
+  }
+
+  public getNetwork(): Promise<string> {
+    return this.promisify(this.web3.version.getNetwork, this.web3.version)();
+  }
+
   public getCurrentAccount(): string {
     return this.web3.eth.defaultAccount;
   }

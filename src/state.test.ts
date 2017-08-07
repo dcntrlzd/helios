@@ -12,12 +12,12 @@ afterEach(() => {
 });
 
 it('can create a new state instance', () => {
-  const state = new State(STATE_PATH);
+  const state = new State({ path: STATE_PATH });
   expect(fs.readFileSync(STATE_PATH).toString()).toMatchSnapshot();
 });
 
 it('does not persists if no state path is given', () => {
-  const state = new State();
+  const state = new State({ path: false });
   expect(fs.existsSync(STATE_PATH)).toBe(false);
   state.setState(420, { version: 0 })
   expect(fs.existsSync(STATE_PATH)).toBe(false);
@@ -25,7 +25,7 @@ it('does not persists if no state path is given', () => {
 });
 
 it('can persist state modifications', async () => {
-  const state = new State(STATE_PATH);
+  const state = new State({ path: STATE_PATH });
   expect(fs.readFileSync(STATE_PATH).toString()).toMatchSnapshot();
   state.setState(420, { version: 0 });
   expect(fs.readFileSync(STATE_PATH).toString()).toMatchSnapshot();
@@ -34,6 +34,6 @@ it('can persist state modifications', async () => {
 
 it('can preload a previously persisted state', () => {
   fs.writeFileSync(STATE_PATH, JSON.stringify({ 420: { version: 0 } }));
-  const state = new State(STATE_PATH);
+  const state = new State({ path: STATE_PATH });
   expect(state.getState(420)).toMatchSnapshot();
 });

@@ -1,5 +1,5 @@
 import * as glob from 'glob';
-import * as path from 'path';
+import { basename, join } from 'path';
 
 import Session from './session';
 
@@ -10,28 +10,36 @@ interface IMigration {
   runner: ({ session: Session, migration: IMigration }) => Promise<any> | void;
 }
 
+export interface IMigratorOptions {
+  pattern?: string;
+}
+
+const DEFAULT_PATTERN = '+([0-9])*.js';
+
 export default class Migrator {
-  public migrationsDirectory: string;
-  public migrationsPattern: string = '+([0-9])*.js';
+  public path: string;
+  public pattern: string;
 
   private currentIndex: number;
   private session: Session;
 
-  constructor(migrationsDirectory: string, migrationsPattern?: string) {
-    this.migrationsDirectory = migrationsDirectory;
-    this.migrationsPattern = migrationsPattern ? migrationsPattern : this.migrationsPattern;
+  constructor(session: Session, path: string, options: IMigratorOptions = {}) {
+    const { pattern } = options;
+
+    this.session = session;
+    this.path = path;
+    this.pattern = pattern ? pattern : DEFAULT_PATTERN;
   }
 
   public getSession(): Session {
-    if (!this.session) {
-      this.session = new Session();
-    }
     return this.session;
   }
 
   public async run(): Promise<any> {
+    const { session } = this;
+    await session.promise;
+
     const migrations = this.getMigrations();
-    const session = this.getSession();
 
     if (migrations.length === 0) {
       throw new Error('No migrations found');
@@ -43,10 +51,10 @@ export default class Migrator {
   }
 
   public getMigrations(): IMigration[] {
-    const globPattern = path.join(this.migrationsDirectory, this.migrationsPattern);
+    const globPattern = join(this.path, this.pattern);
 
     const migrations = glob.sync(globPattern).map((migrationPath) => {
-      const migrationName = path.basename(migrationPath);
+      const migrationName = basename(migrationPath);
 
       return {
         id: Number(migrationName.match(/([0-9]+).*/)[1]),

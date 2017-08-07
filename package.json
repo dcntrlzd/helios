@@ -5,6 +5,9 @@
   "main": "index.js",
   "scripts": {
     "lint": "tslint -p . --fix",
+    "build": "npm-run-all -s build:prepare build:compile",
+    "build:prepare": "rm -rf build",
+    "build:compile": "tsc --outDir build",
     "testrpc": "better-npm-run testrpc",
     "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch"
   },
@@ -20,7 +23,7 @@
     "loader-utils": "^1.1.0",
     "mkdirp": "^0.5.1",
     "solc": "^0.4.13",
-    "web3": "^0.19.1"
+    "web3": "^0.20.1"
   },
   "jest": {
     "verbose": true,
@@ -38,6 +41,7 @@
       "**/__tests__/**/*.[tj]s",
       "**/?(*.)(spec|test).[tj]s"
     ],
+    "setupTestFrameworkScriptFile": "<rootDir>/test/prepare.js",
     "transformIgnorePatterns": [
       "<rootDir>/node_modules/"
     ]

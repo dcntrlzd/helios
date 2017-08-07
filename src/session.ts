@@ -1,18 +1,19 @@
-import * as TestRPC from 'ethereumjs-testrpc';
+
 import * as Web3 from 'web3';
 
 import Client from './client';
-import Compiler from './compiler';
-import State from './state';
+import Compiler, { ICompilerOptions } from './compiler';
+import State, { IStateOptions } from './state';
 
 interface ISessionOptions {
   statePath?: string;
-  provider?: any;
+  compiler?: ICompilerOptions;
+  state?: IStateOptions;
 }
 
 export default class Session {
-  public static create(options: ISessionOptions): Promise<Session> {
-    return new Promise((resolve) => new Session(options, resolve));
+  public static create(provider: any, options: ISessionOptions): Promise<Session> {
+    return new Promise((resolve) => new Session(provider, options, resolve));
   }
 
   public client: Client;
@@ -22,36 +23,34 @@ export default class Session {
   private provider: any;
   private state: State;
   private compiler: Compiler;
-  private networkId: number;
+  private networkId: string;
 
-  public constructor(options: ISessionOptions = {}, callback?: (Session) => void) {
-    const { provider, statePath } = options;
-
+  public constructor(provider: any, options: ISessionOptions = {}, callback?: (Session) => void) {
     if (provider) {
       this.provider = provider;
     } else if (process.env.HELIOS_NODE_URL) {
       this.provider = new Web3.providers.HttpProvider(process.env.HELIOS_NODE_URL);
     } else {
-      this.provider = TestRPC.provider(options);
+      throw new Error('No provider supplied for the session');
     }
 
     this.client = new Client(this.provider);
-    this.state = new State(statePath);
+    this.state = new State(options.state);
 
-    this.compiler = new Compiler();
+    this.compiler = new Compiler(options.compiler);
     this.compile = this.compiler.compile.bind(this.compiler);
 
-    this.promise = new Promise((resolve) => {
-      this.client.web3.version.getNetwork((error, networkId) => {
-        if (error) {
-          throw new Error('Cannot fetch network id');
-        }
+    this.promise = Promise.all([
+      this.client.getNetwork().then((networkId) => {
         this.networkId = networkId;
-        if (callback) {
-          callback(this);
-        }
-        resolve();
-      });
+      }),
+      this.client.getAccounts().then(([account]) => {
+        this.client.setCurrentAccount(account);
+      }),
+    ]).then(() => {
+      if (callback) {
+        callback(this);
+      }
     });
   }
 
@@ -83,7 +82,7 @@ export default class Session {
     if (!this.provider.manager.state.blockchain.vm) {
       throw new Error('VM not ready yet');
     }
-    // HARDCORE DEBUGGER:
+    // TODO: Implement debuger
     this.provider.manager.state.blockchain.vm.on('step', callback);
   }
 
@@ -94,7 +93,7 @@ export default class Session {
     }
 
     return new Promise((resolve, reject) => {
-      this.provider.sendAsync(payload, (err, res) => {
+      this.provider.send(payload, (err, res) => {
         if (!err) {
           resolve(res);
           return;
