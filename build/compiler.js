@@ -20,7 +20,7 @@ class Compiler {
             mkdirp.sync(this.cacheDir);
         }
     }
-    static async resolveImports(source, importResolver) {
+    static async resolveImports(source, context, importResolver) {
         const importPattern = /import\s+("(.*)"|'(.*)');/ig;
         const importList = [];
         const resolvers = [];
@@ -28,17 +28,24 @@ class Compiler {
         while (groups) {
             const importPath = groups[2] || groups[3];
             const match = groups[0];
-            resolvers.push(importResolver(importPath).then((importSource) => {
+            resolvers.push(importResolver(importPath, context)
+                .then((importSource) => {
+                const importContext = path.resolve(context, path.dirname(importPath));
+                return Compiler.resolveImports(importSource, importContext, importResolver);
+            })
+                .then((resolvedImportSource) => {
                 importList.push({
                     match,
                     path: importPath,
-                    source: importSource,
+                    source: resolvedImportSource,
                 });
             }));
             groups = importPattern.exec(source);
         }
         await Promise.all(resolvers);
-        return importList;
+        return importList.reduce((acc, { match, source: importSource }) => {
+            return acc.replace(match, importSource);
+        }, source);
     }
     static getChecksum(str, algorithm = 'md5') {
         return crypto
@@ -74,17 +81,17 @@ class Compiler {
         }, {});
         return compiledContractMap;
     }
-    async compile(relativePath, importResolver) {
+    async compileFile(relativePath) {
         const [selfCall, fnCall] = callsite();
         const refPath = path.dirname(fnCall.getFileName());
-        const contractPath = path.resolve(refPath, relativePath);
-        const source = fs.readFileSync(contractPath).toString();
-        importResolver = importResolver ? importResolver : this.buildFSResolver(contractPath);
-        const importList = await Compiler.resolveImports(source, importResolver);
-        const sourceWithImports = importList.reduce((acc, { match, source: importSource }) => {
-            return acc.replace(match, importSource);
-        }, source);
-        return this.process(sourceWithImports);
+        const sourcePath = path.resolve(refPath, relativePath);
+        const context = path.dirname(sourcePath);
+        const source = fs.readFileSync(sourcePath).toString();
+        return this.compile(source, context, this.fsResolver);
+    }
+    async compile(source, context, importResolver, options) {
+        const sourceWithImports = await Compiler.resolveImports(source, context, importResolver);
+        return this.process(sourceWithImports, options);
     }
     defaultCacheDir() {
         const { getuid } = process;
@@ -112,20 +119,17 @@ class Compiler {
         fs.writeFileSync(filePath, json);
         return checksum;
     }
-    buildFSResolver(contractPath) {
-        const basePath = path.dirname(contractPath);
-        return (importPath) => {
-            return new Promise((resolve, reject) => {
-                const filePath = path.resolve(basePath, importPath);
-                fs.readFile(filePath, (err, fileContents) => {
-                    if (err) {
-                        reject(err);
-                        return;
-                    }
-                    resolve(fileContents.toString());
-                });
+    fsResolver(importPath, importContext) {
+        return new Promise((resolve, reject) => {
+            const filePath = path.resolve(importContext, importPath);
+            fs.readFile(filePath, (err, fileContents) => {
+                if (err) {
+                    reject(err);
+                    return;
+                }
+                resolve(fileContents.toString());
             });
-        };
+        });
     }
 }
 Compiler.TMP_NAME = 'helios';

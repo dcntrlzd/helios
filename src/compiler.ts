@@ -15,12 +15,6 @@ interface IGasEstimates {
 
 type IImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
-interface IImportDirective {
-  path: string;
-  match: string;
-  source: string;
-}
-
 interface ICompileOptions {
   includeData?: boolean;
 }
@@ -48,7 +42,7 @@ export default class Compiler {
     source: string,
     context: string,
     importResolver: IImportResolver,
-  ): Promise<IImportDirective[]> {
+  ): Promise<string> {
     const importPattern = /import\s+("(.*)"|'(.*)');/ig;
     const importList = [];
     const resolvers = [];

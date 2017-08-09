@@ -31,7 +31,7 @@ class Migrator {
             return {
                 id: Number(migrationName.match(/([0-9]+).*/)[1]),
                 name: migrationName,
-                path: migrationPath,
+                path: path_1.relative(this.path, migrationPath),
                 runner: require(migrationPath),
             };
         });

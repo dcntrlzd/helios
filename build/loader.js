@@ -4,11 +4,11 @@ const compiler_1 = require("./compiler");
 // Loader for Webpack
 function loader(source) {
     const options = loaderUtils.getOptions(this);
-    const compiler = new compiler_1.default(options);
+    const compiler = new compiler_1.default();
     const callback = this.async();
-    compiler_1.default.resolveImports(source, (importPath) => {
+    const importResolver = (path, context) => {
         return new Promise((resolve, reject) => {
-            this.resolve(this.context, importPath, (err, result) => {
+            this.resolve(context, path, (err, result) => {
                 if (err) {
                     reject(err);
                     return;
@@ -17,11 +17,8 @@ function loader(source) {
                 resolve(this.fs.readFileSync(result).toString());
             });
         });
-    }).then((importList) => {
-        const sourceWithImports = importList.reduce((acc, { match, source: importSource }) => {
-            return acc.replace(match, importSource);
-        }, source);
-        const data = compiler.process(sourceWithImports, options);
+    };
+    compiler.compile(source, this.context, importResolver, options).then((data) => {
         callback(null, `module.exports = ${JSON.stringify(data)}`);
     }).catch((err) => {
         callback(err);

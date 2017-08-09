@@ -8,7 +8,7 @@ function loader(source: string) {
   const compiler = new Compiler();
   const callback = this.async();
 
-  const importResolver = (path, context) => {
+  const importResolver = (path, context): Promise<string> => {
     return new Promise((resolve, reject) => {
       this.resolve(context, path, (err, result) => {
         if (err) {

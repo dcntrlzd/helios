@@ -21,7 +21,7 @@ class Session {
         this.client = new client_1.default(this.provider);
         this.state = new state_1.default(options.state);
         this.compiler = new compiler_1.default(options.compiler);
-        this.compile = this.compiler.compile.bind(this.compiler);
+        this.compile = this.compiler.compileFile.bind(this.compiler);
         this.promise = Promise.all([
             this.client.getNetwork().then((networkId) => {
                 this.networkId = networkId;
