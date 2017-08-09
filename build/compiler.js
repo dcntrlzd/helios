@@ -20,29 +20,29 @@ class Compiler {
             mkdirp.sync(this.cacheDir);
         }
     }
-    static async resolveImports(source, context, importResolver) {
+    static async resolveImports(source, context, importResolver, ignoreImports = []) {
         const importPattern = /import\s+("(.*)"|'(.*)');/ig;
         const importList = [];
-        const resolvers = [];
         let groups = importPattern.exec(source);
         while (groups) {
             const importPath = groups[2] || groups[3];
             const match = groups[0];
-            resolvers.push(importResolver(importPath, context)
-                .then((importSource) => {
-                const importContext = path.resolve(context, path.dirname(importPath));
-                return Compiler.resolveImports(importSource, importContext, importResolver);
-            })
-                .then((resolvedImportSource) => {
-                importList.push({
-                    match,
-                    path: importPath,
-                    source: resolvedImportSource,
-                });
-            }));
+            const absImportPath = path.resolve(context, importPath);
+            const importSource = await importResolver(importPath, context);
+            const importContext = path.dirname(absImportPath);
+            let resolvedImportSource = '';
+            if (!ignoreImports.includes(absImportPath)) {
+                resolvedImportSource = await Compiler
+                    .resolveImports(importSource, importContext, importResolver, ignoreImports);
+                ignoreImports.push(absImportPath);
+            }
+            importList.push({
+                match,
+                path: absImportPath,
+                source: resolvedImportSource,
+            });
             groups = importPattern.exec(source);
         }
-        await Promise.all(resolvers);
         return importList.reduce((acc, { match, source: importSource }) => {
             return acc.replace(match, importSource);
         }, source);
