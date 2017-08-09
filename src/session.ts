@@ -38,7 +38,7 @@ export default class Session {
     this.state = new State(options.state);
 
     this.compiler = new Compiler(options.compiler);
-    this.compile = this.compiler.compile.bind(this.compiler);
+    this.compile = this.compiler.compileFile.bind(this.compiler);
 
     this.promise = Promise.all([
       this.client.getNetwork().then((networkId) => {

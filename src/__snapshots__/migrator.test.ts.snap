@@ -5,13 +5,13 @@ Array [
   Object {
     "id": 1,
     "name": "01-manager.js",
-    "path": "/Users/matrushka/dev/dcntrlzd/helios/test/migrations/01-manager.js",
+    "path": "01-manager.js",
     "runner": [Function],
   },
   Object {
     "id": 2,
     "name": "02-deployContracts.js",
-    "path": "/Users/matrushka/dev/dcntrlzd/helios/test/migrations/02-deployContracts.js",
+    "path": "02-deployContracts.js",
     "runner": [Function],
   },
 ]

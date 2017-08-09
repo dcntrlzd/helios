@@ -13,7 +13,7 @@ interface IGasEstimates {
   internal: { [method: string]: number };
 }
 
-type IImportResolver = (importPath: string) => Promise<string>;
+type IImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
 interface IImportDirective {
   path: string;
@@ -44,7 +44,11 @@ let solc;
 export default class Compiler {
   public static TMP_NAME= 'helios';
 
-  public static async resolveImports(source: string, importResolver: IImportResolver): Promise<IImportDirective[]> {
+  public static async resolveImports(
+    source: string,
+    context: string,
+    importResolver: IImportResolver,
+  ): Promise<IImportDirective[]> {
     const importPattern = /import\s+("(.*)"|'(.*)');/ig;
     const importList = [];
     const resolvers = [];
@@ -55,20 +59,29 @@ export default class Compiler {
       const importPath = groups[2] || groups[3];
       const match = groups[0];
 
-      resolvers.push(importResolver(importPath).then((importSource) => {
-        importList.push({
-          match,
-          path: importPath,
-          source: importSource,
-        });
-      }));
+      resolvers.push(
+        importResolver(importPath, context)
+          .then((importSource) => {
+            const importContext = path.resolve(context, path.dirname(importPath));
+            return Compiler.resolveImports(importSource, importContext, importResolver);
+          })
+          .then((resolvedImportSource) => {
+            importList.push({
+              match,
+              path: importPath,
+              source: resolvedImportSource,
+            });
+          }),
+     );
 
       groups = importPattern.exec(source);
     }
 
     await Promise.all(resolvers);
 
-    return importList;
+    return importList.reduce((acc, { match, source: importSource }) => {
+      return acc.replace(match, importSource);
+    }, source);
   }
 
   private static getChecksum(str, algorithm = 'md5') {
@@ -128,21 +141,25 @@ export default class Compiler {
     return compiledContractMap;
   }
 
-  public async compile(relativePath: string, importResolver?: IImportResolver): Promise<ICompiledContractMap> {
+  public async compileFile(relativePath: string): Promise<ICompiledContractMap> {
     const [selfCall, fnCall] = callsite();
     const refPath = path.dirname(fnCall.getFileName());
-    const contractPath = path.resolve(refPath, relativePath);
+    const sourcePath = path.resolve(refPath, relativePath);
+    const context = path.dirname(sourcePath);
 
-    const source: string = fs.readFileSync(contractPath).toString();
-    importResolver = importResolver ? importResolver : this.buildFSResolver(contractPath);
+    const source: string = fs.readFileSync(sourcePath).toString();
+    return this.compile(source, context, this.fsResolver);
+  }
 
-    const importList = await Compiler.resolveImports(source, importResolver);
+  public async compile(
+    source: string,
+    context: string,
+    importResolver: IImportResolver,
+    options?: ICompileOptions,
+  ): Promise<ICompiledContractMap> {
+    const sourceWithImports = await Compiler.resolveImports(source, context, importResolver);
 
-    const sourceWithImports = importList.reduce((acc, { match, source: importSource }) => {
-      return acc.replace(match, importSource);
-    }, source);
-
-    return this.process(sourceWithImports);
+    return this.process(sourceWithImports, options);
   }
 
   private defaultCacheDir(): string {
@@ -173,11 +190,9 @@ export default class Compiler {
     return checksum;
   }
 
-  private buildFSResolver(contractPath: string): IImportResolver {
-    const basePath = path.dirname(contractPath);
-    return (importPath: string) => {
+  private fsResolver(importPath: string, importContext: string): Promise<string> {
       return new Promise((resolve, reject) => {
-        const filePath = path.resolve(basePath, importPath);
+        const filePath = path.resolve(importContext, importPath);
         fs.readFile(filePath, (err, fileContents) => {
           if (err) {
             reject(err);
@@ -186,6 +201,5 @@ export default class Compiler {
           resolve(fileContents.toString());
         });
       });
-    };
-  }
+    }
 }

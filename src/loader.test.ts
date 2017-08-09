@@ -62,3 +62,10 @@ it('compiles a solidity contract with imports using the loader', () => {
     expect(info.modules[0].source).toMatchSnapshot();
   });
 });
+
+it('compiles a solidity contract with deep imports using the loader', () => {
+  return runWebpack('../test/contracts/Tree.sol').then((info) => {
+    // TODO: check for file dependencies
+    expect(info.modules[0].source).toMatchSnapshot();
+  });
+});

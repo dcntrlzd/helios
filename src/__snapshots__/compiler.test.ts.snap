@@ -47,6 +47,35 @@ Object {
 }
 `;
 
+exports[`Compiler can compile a contract with deep imports 1`] = `
+Object {
+  "Branch": Object {
+    "abi": Array [],
+    "data": "60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a7230582041a11fe45a9ecae5e23ccf02d94df22ee65f3653cf5ee8c44b7bb956d8e417260029",
+    "gasEstimates": Object {
+      "creation": Array [
+        62,
+        10800,
+      ],
+      "external": Object {},
+      "internal": Object {},
+    },
+  },
+  "Leaf": Object {
+    "abi": Array [],
+    "data": "60606040523415600e57600080fd5b5b603680601c6000396000f30060606040525b600080fd00a165627a7a7230582057fd275a84bd7236d13e75b60aa35da766633b0bf3290bc095e2076b16bdb0370029",
+    "gasEstimates": Object {
+      "creation": Array [
+        62,
+        10800,
+      ],
+      "external": Object {},
+      "internal": Object {},
+    },
+  },
+}
+`;
+
 exports[`Compiler can compile a contract with imports 1`] = `
 Object {
   "ExchangeOffice": Object {

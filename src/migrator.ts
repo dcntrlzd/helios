@@ -1,5 +1,5 @@
 import * as glob from 'glob';
-import { basename, join } from 'path';
+import { basename, join, relative } from 'path';
 
 import Session from './session';
 
@@ -59,7 +59,7 @@ export default class Migrator {
       return {
         id: Number(migrationName.match(/([0-9]+).*/)[1]),
         name: migrationName,
-        path: migrationPath,
+        path: relative(this.path, migrationPath),
         runner: require(migrationPath),
       };
     });

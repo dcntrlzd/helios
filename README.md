@@ -47,6 +47,7 @@ Loosely opinionated solidity contract development library.
 ## TODO
 * detailed documentation
 * complete tests
+* Move includeData setting to the ICompilerOptions and get rid of ICompileOptions
 
 ## Nice to Have
 * prettier for state serialization to make it version control friendly (will require json to js switch);

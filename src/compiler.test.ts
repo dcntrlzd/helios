@@ -16,14 +16,21 @@ describe('Compiler', () => {
 
   it('can compile a contract', async () => {
     const compiler = new Compiler();
-    const contractMap = await compiler.compile('../test/contracts/SimpleStorage.sol');
+    const contractMap = await compiler.compileFile('../test/contracts/SimpleStorage.sol');
 
     expect(contractMap).toMatchSnapshot();
   });
 
   it('can compile a contract with imports', async () => {
     const compiler = new Compiler();
-    const contractMap = await compiler.compile('../test/contracts/HandsOnToken.sol');
+    const contractMap = await compiler.compileFile('../test/contracts/HandsOnToken.sol');
+
+    expect(contractMap).toMatchSnapshot();
+  });
+
+  it('can compile a contract with deep imports', async () => {
+    const compiler = new Compiler();
+    const contractMap = await compiler.compileFile('../test/contracts/Tree.sol');
 
     expect(contractMap).toMatchSnapshot();
   });
