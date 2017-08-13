@@ -7,6 +7,7 @@ const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
 const process = require("process");
+// TODO: Move solc into a private static variable
 let solc;
 class Compiler {
     constructor(options = {}) {

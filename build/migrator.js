@@ -2,13 +2,12 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const glob = require("glob");
 const path_1 = require("path");
-const DEFAULT_PATTERN = '+([0-9])*.js';
 class Migrator {
     constructor(session, path, options = {}) {
         const { pattern } = options;
         this.session = session;
         this.path = path;
-        this.pattern = pattern ? pattern : DEFAULT_PATTERN;
+        this.pattern = pattern ? pattern : Migrator.DEFAULT_PATTERN;
     }
     getSession() {
         return this.session;
@@ -40,4 +39,5 @@ class Migrator {
         return migrations;
     }
 }
+Migrator.DEFAULT_PATTERN = '+([0-9])*.js';
 exports.default = Migrator;

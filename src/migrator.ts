@@ -14,9 +14,8 @@ export interface IMigratorOptions {
   pattern?: string;
 }
 
-const DEFAULT_PATTERN = '+([0-9])*.js';
-
 export default class Migrator {
+  public static DEFAULT_PATTERN = '+([0-9])*.js';
   public path: string;
   public pattern: string;
 
@@ -28,7 +27,7 @@ export default class Migrator {
 
     this.session = session;
     this.path = path;
-    this.pattern = pattern ? pattern : DEFAULT_PATTERN;
+    this.pattern = pattern ? pattern : Migrator.DEFAULT_PATTERN;
   }
 
   public getSession(): Session {

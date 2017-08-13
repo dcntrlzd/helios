@@ -13,7 +13,7 @@ interface IGasEstimates {
   internal: { [method: string]: number };
 }
 
-type IImportResolver = (importPath: string, importContext: string) => Promise<string>;
+type ImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
 interface ICompileOptions {
   includeData?: boolean;
@@ -33,6 +33,7 @@ export interface ICompilerOptions {
   cacheDir?: string;
 }
 
+// TODO: Move solc into a private static variable
 let solc;
 
 export default class Compiler {
@@ -41,7 +42,7 @@ export default class Compiler {
   public static async resolveImports(
     source: string,
     context: string,
-    importResolver: IImportResolver,
+    importResolver: ImportResolver,
     ignoreImports: string[] = [],
   ): Promise<string> {
     const importPattern = /import\s+("(.*)"|'(.*)');/ig;
@@ -148,7 +149,7 @@ export default class Compiler {
   public async compile(
     source: string,
     context: string,
-    importResolver: IImportResolver,
+    importResolver: ImportResolver,
     options?: ICompileOptions,
   ): Promise<ICompiledContractMap> {
     const sourceWithImports = await Compiler.resolveImports(source, context, importResolver);

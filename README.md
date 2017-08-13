@@ -46,11 +46,11 @@ Loosely opinionated solidity contract development library.
 
 ## TODO
 * detailed documentation
-* complete tests
+* complete tests & coverage report
 * Move includeData setting to the ICompilerOptions and get rid of ICompileOptions
 
 ## Nice to Have
-* prettier for state serialization to make it version control friendly (will require json to js switch);
+* prettier & json5 for state (de)serialization to make it version control friendly.
 * cache the engine instance between runtimes to save some time (depends on the test runner configuration).
 * use step handler of the vm to debug the contract.
   * Reading states etc. inside the steps.
