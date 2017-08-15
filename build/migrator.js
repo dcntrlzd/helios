@@ -27,11 +27,15 @@ class Migrator {
         const globPattern = path_1.join(this.path, this.pattern);
         const migrations = glob.sync(globPattern).map((migrationPath) => {
             const migrationName = path_1.basename(migrationPath);
+            const runner = require(migrationPath);
+            if (!runner.apply) {
+                throw new Error(`Invalid migration runner defined in ${migrationPath}`);
+            }
             return {
                 id: Number(migrationName.match(/([0-9]+).*/)[1]),
                 name: migrationName,
                 path: path_1.relative(this.path, migrationPath),
-                runner: require(migrationPath),
+                runner,
             };
         });
         // TODO: check if migration runner is a function or not

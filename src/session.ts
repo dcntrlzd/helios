@@ -5,7 +5,7 @@ import Client from './client';
 import Compiler, { ICompilerOptions } from './compiler';
 import State, { IStateOptions } from './state';
 
-interface ISessionOptions {
+export interface ISessionOptions {
   statePath?: string;
   compiler?: ICompilerOptions;
   state?: IStateOptions;
@@ -82,7 +82,6 @@ export default class Session {
     if (!this.provider.manager.state.blockchain.vm) {
       throw new Error('VM not ready yet');
     }
-    // TODO: Implement debuger
     this.provider.manager.state.blockchain.vm.on('step', callback);
   }
 

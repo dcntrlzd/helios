@@ -47,7 +47,9 @@ Loosely opinionated solidity contract development library.
 ## TODO
 * detailed documentation
 * complete tests & coverage report
-* Move includeData setting to the ICompilerOptions and get rid of ICompileOptions
+* refactor file strucure to be npm friendly
+  * public (available as helios/XXX) : loader, client, migrator, session (index)
+  * private (available as helios/lib/XXX): compiler, state 
 
 ## Nice to Have
 * prettier & json5 for state (de)serialization to make it version control friendly.

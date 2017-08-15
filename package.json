@@ -16,7 +16,7 @@
     "testrpc": "testrpc -m \"$TESTRPC_MNEMONIC\""
   },
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "bignumber.js": "^4.0.2",
     "callsite": "^1.0.0",

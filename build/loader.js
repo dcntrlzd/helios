@@ -3,8 +3,8 @@ const loaderUtils = require("loader-utils");
 const compiler_1 = require("./compiler");
 // Loader for Webpack
 function loader(source) {
-    const options = loaderUtils.getOptions(this);
-    const compiler = new compiler_1.default();
+    const options = Object.assign({ includeData: false }, loaderUtils.getOptions(this) || {});
+    const compiler = new compiler_1.default(options);
     const callback = this.async();
     const importResolver = (path, context) => {
         return new Promise((resolve, reject) => {
@@ -18,7 +18,7 @@ function loader(source) {
             });
         });
     };
-    compiler.compile(source, this.context, importResolver, options).then((data) => {
+    compiler.compile(source, this.context, importResolver).then((data) => {
         callback(null, `module.exports = ${JSON.stringify(data)}`);
     }).catch((err) => {
         callback(err);

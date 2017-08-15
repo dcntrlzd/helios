@@ -4,8 +4,12 @@ import Compiler from './compiler';
 
 // Loader for Webpack
 function loader(source: string) {
-  const options = loaderUtils.getOptions(this);
-  const compiler = new Compiler();
+  const options = Object.assign(
+    { includeData: false },
+    loaderUtils.getOptions(this) || {},
+  );
+
+  const compiler = new Compiler(options);
   const callback = this.async();
 
   const importResolver = (path, context): Promise<string> => {
@@ -21,7 +25,7 @@ function loader(source: string) {
     });
   };
 
-  compiler.compile(source, this.context, importResolver, options).then((data) => {
+  compiler.compile(source, this.context, importResolver).then((data) => {
     callback(null, `module.exports = ${JSON.stringify(data)}`);
   }).catch((err) => {
     callback(err);

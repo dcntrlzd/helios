@@ -7,17 +7,13 @@ import * as path from 'path';
 import * as process from 'process';
 import * as Web3 from 'web3';
 
-interface IGasEstimates {
+export interface IGasEstimates {
   creation: [number, number];
   external: { [method: string]: number };
   internal: { [method: string]: number };
 }
 
-type ImportResolver = (importPath: string, importContext: string) => Promise<string>;
-
-interface ICompileOptions {
-  includeData?: boolean;
-}
+export type ImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
 export interface ICompiledContract {
   abi: Web3.ContractAbi;
@@ -31,13 +27,11 @@ export interface ICompiledContractMap {
 
 export interface ICompilerOptions {
   cacheDir?: string;
+  includeData?: boolean;
 }
 
-// TODO: Move solc into a private static variable
-let solc;
-
 export default class Compiler {
-  public static TMP_NAME= 'helios';
+  public static TMP_NAME = 'helios';
 
   public static async resolveImports(
     source: string,
@@ -79,6 +73,8 @@ export default class Compiler {
     }, source);
   }
 
+  private static solc;
+
   private static getChecksum(str, algorithm = 'md5') {
     return crypto
       .createHash(algorithm)
@@ -88,27 +84,31 @@ export default class Compiler {
   }
 
   public cacheDir: string;
+  public includeData: boolean;
 
   constructor(options: ICompilerOptions = {}) {
-    const { cacheDir } = options;
-    this.cacheDir = cacheDir ? cacheDir : this.defaultCacheDir();
+    const { cacheDir, includeData } = options;
 
-    // create the cacheDir if not present or accessible
-    try {
+    this.cacheDir = cacheDir ? cacheDir : this.defaultCacheDir();
+    this.includeData = includeData ? includeData : true;
+
+    try { // create the cacheDir if not present or accessible
       fs.accessSync(this.cacheDir);
     } catch (e) {
       mkdirp.sync(this.cacheDir);
     }
   }
 
-  public process(source: string, options?: ICompileOptions): ICompiledContractMap {
+  public process(source: string): ICompiledContractMap {
     const checksum = Compiler.getChecksum(source);
     let contracts = this.readFromCache(checksum);
 
     if (!contracts) {
-      // Only require when it's needed to shave some init time
-      solc = solc ? solc : require('solc');
-      const result = solc.compile(source);
+      if (!Compiler.solc) { // Only require when it's needed (to shave some init time)
+        Compiler.solc = require('solc');
+      }
+
+      const result = Compiler.solc.compile(source);
 
       if (result.errors) {
         throw new Error(result.errors);
@@ -117,7 +117,7 @@ export default class Compiler {
       this.writeToCache(checksum, contracts);
     }
 
-    const { includeData = true } = (options || {});
+    const { includeData } = this;
 
     const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
       // compiled contract names start with a colon character
@@ -150,11 +150,10 @@ export default class Compiler {
     source: string,
     context: string,
     importResolver: ImportResolver,
-    options?: ICompileOptions,
   ): Promise<ICompiledContractMap> {
     const sourceWithImports = await Compiler.resolveImports(source, context, importResolver);
 
-    return this.process(sourceWithImports, options);
+    return this.process(sourceWithImports);
   }
 
   private defaultCacheDir(): string {

@@ -2,15 +2,15 @@ import { BigNumber } from 'bignumber.js';
 import * as Web3 from 'web3';
 import { ICompiledContract } from './compiler';
 
-type BlockID = string | number;
+export type BlockID = string | number;
 
-interface ISyncObject {
+export interface ISyncObject {
   startingBlock: number;
   currentBlock: number;
   highestBlock: number;
 }
 
-interface ITransaction {
+export interface ITransaction {
   hash: string;
   nonce: number;
   blockHash: string;
@@ -24,7 +24,7 @@ interface ITransaction {
   input: string;
 }
 
-interface ITransactionReceipt {
+export interface ITransactionReceipt {
   blockHash: string;
   blockNumber: number;
   transactionHash: string;
@@ -37,7 +37,7 @@ interface ITransactionReceipt {
   logs: any[];
 }
 
-interface IBlock {
+export interface IBlock {
   number: number;
   hash: string;
   parentHash: string;
@@ -58,7 +58,7 @@ interface IBlock {
   uncles: IBlock[];
 }
 
-interface IDeployOptions {
+export interface IDeployOptions {
   contractName?: string;
   from?: string;
   gas?: number;

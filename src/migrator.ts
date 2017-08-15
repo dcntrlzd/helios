@@ -3,7 +3,7 @@ import { basename, join, relative } from 'path';
 
 import Session from './session';
 
-interface IMigration {
+export interface IMigration {
   name: string;
   path: string;
   id: number;
@@ -55,16 +55,20 @@ export default class Migrator {
     const migrations = glob.sync(globPattern).map((migrationPath) => {
       const migrationName = basename(migrationPath);
 
+      const runner = require(migrationPath);
+      if (!runner.apply) {
+        throw new Error(`Invalid migration runner defined in ${migrationPath}`);
+      }
+
       return {
         id: Number(migrationName.match(/([0-9]+).*/)[1]),
         name: migrationName,
         path: relative(this.path, migrationPath),
-        runner: require(migrationPath),
+        runner,
       };
     });
 
     // TODO: check if migration runner is a function or not
-
     migrations.sort((a, b) => a.id - b.id);
 
     return migrations;

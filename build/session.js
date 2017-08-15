@@ -59,7 +59,6 @@ class Session {
         if (!this.provider.manager.state.blockchain.vm) {
             throw new Error('VM not ready yet');
         }
-        // TODO: Implement debuger
         this.provider.manager.state.blockchain.vm.on('step', callback);
     }
     send(method, ...params) {

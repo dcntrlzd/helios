@@ -7,13 +7,11 @@ const mkdirp = require("mkdirp");
 const os = require("os");
 const path = require("path");
 const process = require("process");
-// TODO: Move solc into a private static variable
-let solc;
 class Compiler {
     constructor(options = {}) {
-        const { cacheDir } = options;
+        const { cacheDir, includeData } = options;
         this.cacheDir = cacheDir ? cacheDir : this.defaultCacheDir();
-        // create the cacheDir if not present or accessible
+        this.includeData = includeData ? includeData : true;
         try {
             fs.accessSync(this.cacheDir);
         }
@@ -55,20 +53,21 @@ class Compiler {
             .digest('hex')
             .toString();
     }
-    process(source, options) {
+    process(source) {
         const checksum = Compiler.getChecksum(source);
         let contracts = this.readFromCache(checksum);
         if (!contracts) {
-            // Only require when it's needed to shave some init time
-            solc = solc ? solc : require('solc');
-            const result = solc.compile(source);
+            if (!Compiler.solc) {
+                Compiler.solc = require('solc');
+            }
+            const result = Compiler.solc.compile(source);
             if (result.errors) {
                 throw new Error(result.errors);
             }
             contracts = result.contracts;
             this.writeToCache(checksum, contracts);
         }
-        const { includeData = true } = (options || {});
+        const { includeData } = this;
         const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
             // compiled contract names start with a colon character
             // so we remove it to make it easier to use (through desconstructors especially)
@@ -90,9 +89,9 @@ class Compiler {
         const source = fs.readFileSync(sourcePath).toString();
         return this.compile(source, context, this.fsResolver);
     }
-    async compile(source, context, importResolver, options) {
+    async compile(source, context, importResolver) {
         const sourceWithImports = await Compiler.resolveImports(source, context, importResolver);
-        return this.process(sourceWithImports, options);
+        return this.process(sourceWithImports);
     }
     defaultCacheDir() {
         const { getuid } = process;
