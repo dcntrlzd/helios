@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "lint": "tslint -p . --fix",
-    "build": "npm-run-all -s build:prepare build:compile",
+    "build": "npm-run-all -s build:prepare build:compile build:doc",
     "build:prepare": "rm -rf build",
     "build:compile": "tsc --outDir build",
-    "build:doc": "npx typedoc --theme minimal --mode file --out ./doc ./src",
+    "build:doc": "npx typedoc --theme minimal --mode file --out ./docs ./src",
     "testrpc": "better-npm-run testrpc",
     "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch"
   },
