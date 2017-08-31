@@ -6,8 +6,6 @@ import State from './state';
 
 module.exports = {
   Client,
-  Compiler,
   Migrator,
   Session,
-  State,
 };

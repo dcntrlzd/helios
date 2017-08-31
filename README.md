@@ -8,7 +8,7 @@ Loosely opinionated solidity contract development library.
 * compiler (done)
   * Compiles sol files with solc
   * Allows imports
-* session/runner (done)
+* session & runner (done)
   * Runs tests in jest or any test runner
 * client (wip)
   * Provides a prettier web3 interface with promises
@@ -17,7 +17,7 @@ Loosely opinionated solidity contract development library.
   * Deployment functions might become a new component called deployer
 * loader (done)
   * Webpack loader for reading sol files
-* state/migrations (done)
+* state& migrations (done)
   * Runs the migrations code
   * Provides an interface for storing the state as configs
   * Such as the address of your migration/manager script
@@ -25,7 +25,7 @@ Loosely opinionated solidity contract development library.
   * So no migration contract provided by the framework (unlike truffle) but every dev has to come up with their own
 
 ## How to use
-* `npm install https://github.com/dcntrlzd/helios`
+* `npm install @dcntrlzd/helios`
 * Configure webpack to use helios/loader for sol files
 ```js
 {
@@ -39,17 +39,14 @@ Loosely opinionated solidity contract development library.
 ```
 * To import your solidity files from your tests use the async compile method of `@dcntrlzd/helios/runner`
 ```js
-  import eth from '@dcntrlzd/helios/runner';
+  import heliosRunner from '@dcntrlzd/helios/runner';
 
-  const { SimpleStorage } = await eth.compile('../contracts/SimpleStorage.sol');
+  const { SimpleStorage } = await heliosRunner.compile('../contracts/SimpleStorage.sol');
 ```
 
 ## TODO
 * detailed documentation
 * complete tests & coverage report
-* refactor file strucure to be npm friendly
-  * public (available as helios/XXX) : loader, client, migrator, session (index)
-  * private (available as helios/lib/XXX): compiler, state 
 
 ## Nice to Have
 * prettier & json5 for state (de)serialization to make it version control friendly.

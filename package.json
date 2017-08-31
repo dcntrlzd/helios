@@ -1,5 +1,5 @@
 {
-  "name": "helios",
+  "name": "@dcntrlzd/helios",
   "version": "0.0.1",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
@@ -8,7 +8,7 @@
     "build": "npm-run-all -s build:cleanup build:compile build:doc",
     "build:cleanup": "rm -rf build",
     "build:compile": "tsc --outDir build",
-    "build:doc": "npx typedoc --theme minimal --mode file --out ./docs ./src",
+    "build:doc": "npx typedoc --target ES5 --theme minimal --mode file --out ./docs ./src",
     "testrpc": "better-npm-run testrpc",
     "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch",
     "pack:clean": "rm *.js *.d.ts; echo",
