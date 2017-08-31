@@ -33,7 +33,7 @@
   "betterScripts": {
     "testrpc": "testrpc -m \"$TESTRPC_MNEMONIC\""
   },
-  "author": "",
+  "author": "Baris Gumustas <barisgumustas@gmail.com>",
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
     "bignumber.js": "^4.0.2",
@@ -88,5 +88,21 @@
     "tslint": "^5.6.0",
     "typedoc": "^0.8.0",
     "typescript": "^2.4.2"
-  }
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcntrlzd/helios.git"
+  },
+  "keywords": [
+    "ethereum",
+    "dapp"
+  ],
+  "bugs": {
+    "url": "https://github.com/dcntrlzd/helios/issues"
+  },
+  "homepage": "https://github.com/dcntrlzd/helios#readme"
 }
