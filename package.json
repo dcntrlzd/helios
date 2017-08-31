@@ -5,13 +5,31 @@
   "main": "index.js",
   "scripts": {
     "lint": "tslint -p . --fix",
-    "build": "npm-run-all -s build:prepare build:compile build:doc",
-    "build:prepare": "rm -rf build",
+    "build": "npm-run-all -s build:cleanup build:compile build:doc",
+    "build:cleanup": "rm -rf build",
     "build:compile": "tsc --outDir build",
     "build:doc": "npx typedoc --theme minimal --mode file --out ./docs ./src",
     "testrpc": "better-npm-run testrpc",
-    "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch"
+    "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch",
+    "pack:clean": "rm *.js *.d.ts; echo",
+    "pack:move": "mv build/* .",
+    "prepack": "npm-run-all -s pack:clean build:cleanup build:compile pack:move",
+    "postpack": "npm-run-all -s pack:clean build:cleanup"
   },
+  "files": [
+    "client.js",
+    "client.d.ts",
+    "compiler.js",
+    "compiler.d.ts",
+    "migrator.js",
+    "migrator.d.ts",
+    "session.js",
+    "session.d.ts",
+    "state.js",
+    "state.d.ts",
+    "loader.js",
+    "loader.d.ts"
+  ],
   "betterScripts": {
     "testrpc": "testrpc -m \"$TESTRPC_MNEMONIC\""
   },
