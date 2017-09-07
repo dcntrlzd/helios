@@ -4,6 +4,7 @@
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
+    "ts": "npx tsc --noEmit --watch",
     "lint": "tslint -p . --fix",
     "build": "npm-run-all -s build:cleanup build:compile build:doc",
     "build:cleanup": "rm -rf build",
@@ -36,6 +37,14 @@
   "author": "Baris Gumustas <barisgumustas@gmail.com>",
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
+    "@types/async": "^2.0.40",
+    "@types/bignumber.js": "^4.0.2",
+    "@types/callsite": "^1.0.30",
+    "@types/glob": "^5.0.30",
+    "@types/jest": "^20.0.6",
+    "@types/memory-fs": "^0.3.0",
+    "@types/node": "^8.0.20",
+    "@types/webpack": "^3.0.8",
     "bignumber.js": "^4.0.2",
     "callsite": "^1.0.0",
     "glob": "^7.1.2",
@@ -66,14 +75,6 @@
     ]
   },
   "devDependencies": {
-    "@types/async": "^2.0.40",
-    "@types/bignumber.js": "^4.0.2",
-    "@types/callsite": "^1.0.30",
-    "@types/glob": "^5.0.30",
-    "@types/jest": "^20.0.6",
-    "@types/memory-fs": "^0.3.0",
-    "@types/node": "^8.0.20",
-    "@types/webpack": "^3.0.8",
     "async": "^2.5.0",
     "better-npm-run": "0.0.15",
     "ethereumjs-testrpc": "^4.1.0",
@@ -87,7 +88,7 @@
     "ts-jest": "^20.0.10",
     "tslint": "^5.6.0",
     "typedoc": "^0.8.0",
-    "typescript": "^2.4.2"
+    "typescript": "^2.5.0"
   },
   "directories": {
     "doc": "docs",

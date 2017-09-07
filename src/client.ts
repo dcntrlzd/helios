@@ -1,6 +1,7 @@
 import { BigNumber } from 'bignumber.js';
-import * as Web3 from 'web3';
+import Web3 = require('web3');
 import { ICompiledContract } from './compiler';
+import { IWeb3Contract, Web3AbiDefinition } from './web3-declarations';
 
 export type BlockID = string | number;
 
@@ -92,13 +93,13 @@ export default class Client {
   public getTransactionFromBlock: (hashOrNumber: BlockID, indexNumber: number) => Promise<ITransaction>;
   public getTransactionReceipt: (hash: string) => Promise<ITransactionReceipt>;
   public getTransactionCount: (address: string) => Promise<number>;
-  public sendTransaction: (object) => Promise<string>;
-  public sendRawTransaction: (object) => Promise<string>;
-  public sign: (object) => Promise<string>;
-  public call: (object) => Promise<string>;
-  public estimateGas: (object) => Promise<number>;
+  public sendTransaction: (object: any) => Promise<string>;
+  public sendRawTransaction: (object: any) => Promise<string>;
+  public sign: (object: any) => Promise<string>;
+  public call: (object: any) => Promise<string>;
+  public estimateGas: (object: any) => Promise<number>;
 
-  public web3: Web3;
+  public web3: any;
 
   constructor(provider: any) {
     this.web3 = new Web3(provider);
@@ -134,10 +135,10 @@ export default class Client {
   public defineContract<C>(
     compiledContract: ICompiledContract,
     address: string,
-  ): Promise<Web3.Contract<C>> {
-    return new Promise<Web3.Contract<C>>((resolve, reject) => {
+  ): Promise<IWeb3Contract<C>> {
+    return new Promise<IWeb3Contract<C>>((resolve, reject) => {
       const { abi, data } = compiledContract;
-      const contract = this.web3.eth.contract<any>(abi);
+      const contract = this.web3.eth.contract(abi);
       resolve(this.promisifyContract(contract.at(address)));
     });
   }
@@ -145,7 +146,7 @@ export default class Client {
   public deployContract<C>(
     compiledContract: ICompiledContract,
     options: IDeployOptions = {},
-  ): Promise<Web3.Contract<C>> {
+  ): Promise<IWeb3Contract<C>> {
     const {
       from,
       args = [],
@@ -153,9 +154,9 @@ export default class Client {
       gasPrice = this.DEPLOYMENT_GAS_PRICE,
     } = options;
 
-    return new Promise<Web3.Contract<C>>((resolve, reject) => {
+    return new Promise<IWeb3Contract<C>>((resolve, reject) => {
       const { abi, data } = compiledContract;
-      const contract = this.web3.eth.contract<any>(abi);
+      const contract = this.web3.eth.contract(abi);
       const deployOptions = { data, gas, gasPrice };
 
       if (from) {
@@ -165,7 +166,7 @@ export default class Client {
       const deployArguments = [
         ...args,
         deployOptions,
-        (err: any, res: Web3.Contract<C>): void => {
+        (err: any, res: IWeb3Contract<C>): void => {
           if (err) {
             reject(err);
             return;
@@ -180,10 +181,10 @@ export default class Client {
     });
   }
 
-  private promisifyContract<C>(baseContract: Web3.Contract<C>): Web3.Contract<C> {
+  private promisifyContract<C>(baseContract: IWeb3Contract<C>): IWeb3Contract<C> {
     const contract = { ...baseContract };
 
-    contract.abi.forEach((abiItem: Web3.AbiDefinition) => {
+    contract.abi.forEach((abiItem: Web3AbiDefinition) => {
       const { name } = abiItem;
       const method = contract[name];
       if (!method) {
