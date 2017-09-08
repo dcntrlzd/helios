@@ -185,9 +185,9 @@ export default class Client {
     const contract = { ...baseContract };
 
     contract.abi.forEach((abiItem: Web3AbiDefinition) => {
-      const { name } = abiItem;
+      const { name, type } = abiItem;
       const method = contract[name];
-      if (!method) {
+      if (!method || type !== 'function' ) {
         return;
       }
 
