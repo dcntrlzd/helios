@@ -29,7 +29,8 @@
     "state.js",
     "state.d.ts",
     "loader.js",
-    "loader.d.ts"
+    "loader.d.ts",
+    "web3-declarations.d.ts"
   ],
   "betterScripts": {
     "testrpc": "testrpc -m \"$TESTRPC_MNEMONIC\""
