@@ -3,7 +3,7 @@ pragma solidity ^0.4.8;
 contract Owned {
     mapping (address => bool) public owners;
 
-    function Owned() {
+    function Owned() public {
         owners[msg.sender] = true;
     }
 
@@ -12,11 +12,11 @@ contract Owned {
         _;
     }
 
-    function addOwner(address ownerToAdd) onlyOwner {
+    function addOwner(address ownerToAdd) public onlyOwner {
         owners[ownerToAdd] = true;
     }
 
-    function removeOwner(address ownerToRemove) onlyOwner {
+    function removeOwner(address ownerToRemove) public onlyOwner {
         owners[ownerToRemove] = false;
     }
 }

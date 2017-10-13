@@ -27,7 +27,7 @@ contract HandsOnToken is Owned {
         string tokenName,
         uint8 decimalUnits,
         string tokenSymbol
-    ) {
+    ) public {
         balanceOf[msg.sender] = initialSupply * (10 ** uint256(decimalUnits));  // Give the creator all initial tokens
         totalSupply = initialSupply;                                   // Update total supply
         name = tokenName;                                              // Set the name for display purposes
@@ -36,7 +36,7 @@ contract HandsOnToken is Owned {
     }
 
     /* Send coins */
-    function transfer(address _to, uint256 _value) {
+    function transfer(address _to, uint256 _value) public {
         if (_to == 0x0) revert();                               // Prevent transfer to 0x0 address. Use burn() instead
         if (balanceOf[msg.sender] < _value) revert();           // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert(); // Check for overflows
@@ -46,15 +46,13 @@ contract HandsOnToken is Owned {
     }
 
     /* Allow another contract to spend some tokens in your behalf */
-    function approve(address _spender, uint256 _value)
-        returns (bool success) {
+    function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         return true;
     }
 
     /* Approve and then communicate the approved contract in a single tx */
-    function approveAndCall(address _spender, uint256 _value, bytes _extraData)
-        returns (bool success) {
+    function approveAndCall(address _spender, uint256 _value, bytes _extraData) public returns (bool success) {
         TokenRecipient spender = TokenRecipient(_spender);
         if (approve(_spender, _value)) {
             spender.receiveApproval(msg.sender, _value, this, _extraData);
@@ -63,7 +61,7 @@ contract HandsOnToken is Owned {
     }
 
     /* A contract attempts to get the coins */
-    function transferFrom(address _from, address _to, uint256 _value) returns (bool success) {
+    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         if (_to == 0x0) revert();                                // Prevent transfer to 0x0 address. Use burn() instead
         if (balanceOf[_from] < _value) revert();                 // Check if the sender has enough
         if (balanceOf[_to] + _value < balanceOf[_to]) revert();  // Check for overflows
@@ -75,7 +73,7 @@ contract HandsOnToken is Owned {
         return true;
     }
 
-    function burn(uint256 _value) returns (bool success) {
+    function burn(uint256 _value) public returns (bool success) {
         if (balanceOf[msg.sender] < _value) revert();            // Check if the sender has enough
         balanceOf[msg.sender] -= _value;                      // Subtract from the sender
         totalSupply -= _value;                                // Updates totalSupply
@@ -83,7 +81,7 @@ contract HandsOnToken is Owned {
         return true;
     }
 
-    function burnFrom(address _from, uint256 _value) returns (bool success) {
+    function burnFrom(address _from, uint256 _value) public returns (bool success) {
         if (balanceOf[_from] < _value) revert();                // Check if the sender has enough
         if (_value > allowance[_from][msg.sender]) revert();    // Check allowance
         balanceOf[_from] -= _value;                          // Subtract from the sender
@@ -92,7 +90,7 @@ contract HandsOnToken is Owned {
         return true;
     }
 
-    function mint(uint256 _value) onlyOwner returns (bool success) {
+    function mint(uint256 _value) public onlyOwner returns (bool success) {
         uint256 amountToBeMinted = _value * (10 ** uint256(decimals));
         if (balanceOf[msg.sender] + amountToBeMinted < balanceOf[msg.sender]) revert();
 
@@ -112,25 +110,25 @@ contract ExchangeOffice is Owned {
     function ExchangeOffice(
         uint256 initialExchangeRate,
         HandsOnToken addressOfExchangeToken
-    ) {
+    ) public {
         exchangeRate = initialExchangeRate;
         exchangeToken = HandsOnToken(addressOfExchangeToken);
     }
 
-    function () payable {
+    function () public payable {
         uint256 amountToBePaid = (exchangeRate * msg.value) / 1 ether;
         exchangeToken.transfer(msg.sender, amountToBePaid);
     }
 
-    function depositEthers(address depositAddress) onlyOwner {
+    function depositEthers(address depositAddress) public onlyOwner {
         depositAddress.transfer(this.balance);
     }
 
-    function depositTokens(address depositAddress) onlyOwner {
+    function depositTokens(address depositAddress) public onlyOwner {
         exchangeToken.transfer(depositAddress, exchangeToken.balanceOf(this));
     }
 
-    function updateExchangeRate(uint256 _exchangeRate) onlyOwner returns (bool success) {
+    function updateExchangeRate(uint256 _exchangeRate) public onlyOwner returns (bool success) {
         exchangeRate = _exchangeRate;
         return true;
     }
