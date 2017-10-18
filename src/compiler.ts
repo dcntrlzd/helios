@@ -5,9 +5,9 @@ import * as mkdirp from 'mkdirp';
 import * as os from 'os';
 import * as path from 'path';
 import * as process from 'process';
-import Web3 = require('web3');
+import * as Web3 from 'web3';
 
-import { IWeb3Contract, Web3AbiDefinition } from './web3-declarations';
+import { ABIDefinition } from './external-declarations/web3';
 
 export interface IGasEstimates {
   creation: [number, number];
@@ -18,7 +18,7 @@ export interface IGasEstimates {
 export type ImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
 export interface ICompiledContract {
-  abi: Web3AbiDefinition;
+  abi: ABIDefinition;
   data: string;
   gasEstimates: IGasEstimates;
 }
@@ -127,7 +127,7 @@ export default class Compiler {
       const contractName = key.replace(/^:/, '');
 
       const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
-      const compiledContract = { abi: JSON.parse(rawAbi) as Web3AbiDefinition, gasEstimates };
+      const compiledContract = { abi: JSON.parse(rawAbi) as ABIDefinition, gasEstimates };
       if (includeData) {
         Object.assign(compiledContract, { data });
       }

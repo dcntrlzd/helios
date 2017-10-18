@@ -1,8 +1,7 @@
-
 import * as Web3 from 'web3';
 
 import Client from './client';
-import Compiler, { ICompilerOptions } from './compiler';
+import Compiler, { ICompilerOptions, ICompiledContract } from './compiler';
 import State, { IStateOptions } from './state';
 
 export interface ISessionOptions {
@@ -34,24 +33,30 @@ export default class Session {
       throw new Error('No provider supplied for the session');
     }
 
-    this.client = new Client(this.provider);
     this.state = new State(options.state);
 
     this.compiler = new Compiler(options.compiler);
     this.compile = this.compiler.compileFile.bind(this.compiler);
 
-    this.promise = Promise.all([
-      this.client.getNetwork().then((networkId) => {
-        this.networkId = networkId;
-      }),
-      this.client.getAccounts().then(([account]) => {
-        this.client.setCurrentAccount(account);
-      }),
-    ]).then(() => {
-      if (callback) {
-        callback(this);
-      }
+    this.promise = Client.create(this.provider).then((client) => {
+      this.client = client;
+      return this.client.getNetwork();
+    }).then((networkId) => {
+      this.networkId = networkId;
+    }).then(() => {
+       if (callback) {
+         callback(this);
+       }
     });
+  }
+
+  public async deployContract({ abi, data }: ICompiledContract, options = {}): Promise<any> {
+    const { web3 } = this.client;
+    const from = web3.eth.defaultAccount;
+
+    return (new web3.eth.Contract(abi))
+      .deploy({ data })
+      .send({ from, ...options });
   }
 
   public getState(): object {

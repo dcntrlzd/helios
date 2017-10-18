@@ -8,23 +8,24 @@ const ETH_TO_WEI = 1000000000000000000;
 
 describe('HandsOnToken', () => {
   it('Creates the token', async () => {
+    const from = helios.client.getCurrentAccount();
     const { HandsOnToken, ExchangeOffice } = await helios.compile('./HandsOnToken.sol');
-    const [account] = await helios.client.getAccounts();
-    helios.client.setCurrentAccount(account);
+    const account = helios.client.getCurrentAccount();
 
     const contract = await helios.client.deployContract(HandsOnToken, {
       args: [INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT']
     });
 
-    const value = await contract.balanceOf(account);
-    expect(value.toNumber()).toBe(Math.pow(10, DECIMALS) * INITIAL_SUPPLY);
+    const value = await contract.methods.balanceOf(account).call();
+    expect(Number(value)).toBe(Math.pow(10, DECIMALS) * INITIAL_SUPPLY);
   });
 });
 
 describe('ExchangeOffice', () => {
   it('Creates the contract and exchanges ETH for HOT', async () => {
     const { HandsOnToken, ExchangeOffice } = await helios.compile('./HandsOnToken.sol');
-    const accounts = await helios.client.getAccounts();
+    const { web3 } = helios.client;
+    const accounts = await web3.eth.getAccounts();
 
     const [account, testAccount] = accounts;
     helios.client.setCurrentAccount(account);
@@ -34,24 +35,25 @@ describe('ExchangeOffice', () => {
     });
 
     const contract = await helios.client.deployContract(ExchangeOffice, {
-      args: [1000, token.address]
+      args: [1000, token.options.address]
     });
 
     // Transfer tokens to the exchange office
-    await token.transfer(contract.address, 1000 * Math.pow(10, DECIMALS));
-    const value = await token.balanceOf(contract.address);
-    expect(value.toNumber()).toBe(Math.pow(10, DECIMALS) * 1000);
+    await token.methods.transfer(contract.options.address, 1000 * Math.pow(10, DECIMALS)).send({ from: account });
+    const value = await token.methods.balanceOf(contract.options.address).call();
+    expect(Number(value)).toBe(Math.pow(10, DECIMALS) * 1000);
 
     // Run the exchange contract
     helios.client.setCurrentAccount(testAccount);
-    await helios.client.sendTransaction({ to: contract.address, value: 2.5 * ETH_TO_WEI, gas: helios.client.DEPLOYMENT_GAS });
-    const balanceOfContract = await helios.client.getBalance(contract.address);
-    const tokenBalanceOfTestAccount = await token.balanceOf(testAccount);
-    const tokenBalanceOfContract = await token.balanceOf(contract.address);
+    await web3.eth.sendTransaction({ to: contract.options.address, value: 2.5 * ETH_TO_WEI, gas: helios.client.DEPLOYMENT_GAS });
+    
+    const balanceOfContract = await web3.eth.getBalance(contract.options.address);
+    const tokenBalanceOfTestAccount = await token.methods.balanceOf(testAccount).call();
+    const tokenBalanceOfContract = await token.methods.balanceOf(contract.options.address).call();
 
     // Assert values
-    expect(tokenBalanceOfTestAccount.toNumber()).toBe(2500);
-    expect(tokenBalanceOfContract.toNumber()).toBe(97500);
-    expect(balanceOfContract.toNumber()).toBe(2.5 * ETH_TO_WEI);
+    expect(Number(tokenBalanceOfTestAccount)).toBe(2500);
+    expect(Number(tokenBalanceOfContract)).toBe(97500);
+    expect(Number(balanceOfContract)).toBe(2.5 * ETH_TO_WEI);
   });
 });
