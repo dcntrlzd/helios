@@ -1,6 +1,8 @@
 import { BigNumber } from 'bignumber.js';
-import * as Web3 from 'web3';
+import Web3 = require('web3'); // tslint:disable-line
 import { ICompiledContract } from './compiler';
+
+import { Contract } from 'web3/types.d';
 
 
 export interface IDeployOptions {
@@ -32,12 +34,9 @@ export default class Client {
     });
   }
 
-  public isConnected(): string {
-    return this.web3.isConnected();
-  }
-
   public getNetwork(): Promise<string> {
-    return this.web3.eth.net.getId();
+    const net = this.web3.eth.net as { getId: () => Promise<string> };
+    return net.getId();
   }
 
   public getCurrentAccount(): string {
@@ -48,10 +47,10 @@ export default class Client {
     this.web3.eth.defaultAccount = account;
   }
 
-  public defineContract(
+  public async defineContract(
     { abi }: ICompiledContract,
     address: string,
-  ): Promise<Web3.Contract> {
+  ): Promise<Contract> {
     return new this.web3.eth.Contract(abi, address, {
       from: this.getCurrentAccount(),
     });
@@ -60,7 +59,7 @@ export default class Client {
   public deployContract(
     { abi, data }: ICompiledContract,
     options: IDeployOptions = {},
-  ): Promise<Web3.Contract> {
+  ): Promise<Contract> {
     const optionsWithDefaults = {
       args: [],
       from: this.getCurrentAccount(),

@@ -1,4 +1,4 @@
-import * as Web3 from 'web3';
+import Web3 = require('web3'); // tslint:disable-line
 
 import Client from './client';
 import Compiler, { ICompilerOptions, ICompiledContract } from './compiler';
@@ -55,7 +55,7 @@ export default class Session {
     const from = web3.eth.defaultAccount;
 
     return (new web3.eth.Contract(abi))
-      .deploy({ data })
+      .deploy({ data, arguments: [] })
       .send({ from, ...options });
   }
 
