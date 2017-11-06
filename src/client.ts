@@ -1,6 +1,7 @@
 import { BigNumber } from 'bignumber.js';
-import Web3 from 'web3';
+import * as Web3 from 'web3';
 import { ICompiledContract } from './compiler';
+
 
 export interface IDeployOptions {
   contractName?: string;
