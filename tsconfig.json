@@ -8,7 +8,7 @@
     "types" : [ "node" ]
   },
   "include": [
-    "./node_modules/@types/jest/index.d.ts",
+    "./node_modules/web3/index.d.ts",
     "./src/**/*.ts"
   ],
   "exclude": [

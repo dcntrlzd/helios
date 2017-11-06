@@ -1,7 +1,6 @@
 import { BigNumber } from 'bignumber.js';
-import * as Web3 from 'web3';
+import Web3 from 'web3';
 import { ICompiledContract } from './compiler';
-import { Contract } from './external-declarations/web3';
 
 export interface IDeployOptions {
   contractName?: string;
@@ -19,7 +18,7 @@ export default class Client {
   public DEPLOYMENT_GAS = 3141592;
   public DEPLOYMENT_GAS_PRICE = 100000000000;
 
-  public web3: any;
+  public web3: Web3;
 
   constructor(provider: any, callback?: (client: Client) => void) {
     this.web3 = new Web3(provider);
@@ -51,7 +50,7 @@ export default class Client {
   public defineContract(
     { abi }: ICompiledContract,
     address: string,
-  ): Promise<Contract> {
+  ): Promise<Web3.Contract> {
     return new this.web3.eth.Contract(abi, address, {
       from: this.getCurrentAccount(),
     });
@@ -60,7 +59,7 @@ export default class Client {
   public deployContract(
     { abi, data }: ICompiledContract,
     options: IDeployOptions = {},
-  ): Promise<Contract> {
+  ): Promise<Web3.Contract> {
     const optionsWithDefaults = {
       args: [],
       from: this.getCurrentAccount(),

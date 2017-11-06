@@ -7,8 +7,6 @@ import * as path from 'path';
 import * as process from 'process';
 import * as Web3 from 'web3';
 
-import { ABIDefinition } from './external-declarations/web3';
-
 export interface IGasEstimates {
   creation: [number, number];
   external: { [method: string]: number };
@@ -18,7 +16,7 @@ export interface IGasEstimates {
 export type ImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
 export interface ICompiledContract {
-  abi: ABIDefinition;
+  abi: Web3.ABIDefinition;
   data: string;
   gasEstimates: IGasEstimates;
 }
@@ -127,7 +125,7 @@ export default class Compiler {
       const contractName = key.replace(/^:/, '');
 
       const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
-      const compiledContract = { abi: JSON.parse(rawAbi) as ABIDefinition, gasEstimates };
+      const compiledContract = { abi: JSON.parse(rawAbi) as Web3.ABIDefinition, gasEstimates };
       if (includeData) {
         Object.assign(compiledContract, { data });
       }
