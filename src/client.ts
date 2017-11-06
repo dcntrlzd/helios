@@ -4,7 +4,6 @@ import { ICompiledContract } from './compiler';
 
 import { Contract } from 'web3/types.d';
 
-
 export interface IDeployOptions {
   contractName?: string;
   from?: string;

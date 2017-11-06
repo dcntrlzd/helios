@@ -1,7 +1,7 @@
 import Web3 = require('web3'); // tslint:disable-line
 
 import Client from './client';
-import Compiler, { ICompilerOptions, ICompiledContract } from './compiler';
+import Compiler, { ICompiledContract, ICompilerOptions } from './compiler';
 import State, { IStateOptions } from './state';
 
 export interface ISessionOptions {
