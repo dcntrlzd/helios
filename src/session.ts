@@ -1,5 +1,4 @@
-import Web3 = require('web3'); // tslint:disable-line
-
+import Web3 = require('web3');
 import Client from './client';
 import Compiler, { ICompiledContract, ICompilerOptions } from './compiler';
 import State, { IStateOptions } from './state';
@@ -22,7 +21,7 @@ export default class Session {
   private provider: any;
   private state: State;
   private compiler: Compiler;
-  private networkId: string;
+  private networkId: number;
 
   public constructor(provider: any, options: ISessionOptions = {}, callback?: (Session) => void) {
     if (provider) {

@@ -32,4 +32,4 @@ function loader(source: string) {
   });
 }
 
-export = loader;
+export default loader;

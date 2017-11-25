@@ -1,11 +1,12 @@
 {
   "compilerOptions": {
-    "lib": ["es2015.promise", "es2015", "es2016", "es2017"],
     "target": "es2017",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "inlineSources": true,
+    "inlineSourceMap": true,
     "declaration": true,
-    "types" : [ "node" ]
+    "moduleResolution": "node",
+    // Needed for preventing error TS1202
+    "module": "commonjs"
   },
   "include": [
     "./node_modules/web3/index.d.ts",

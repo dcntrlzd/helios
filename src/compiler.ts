@@ -5,7 +5,7 @@ import * as mkdirp from 'mkdirp';
 import * as os from 'os';
 import * as path from 'path';
 import * as process from 'process';
-import Web3 = require('web3'); // tslint:disable-line
+import Web3 = require('web3');
 
 import { ABIDefinition } from 'web3/types.d';
 

@@ -17,7 +17,7 @@ it('can create a new state instance', () => {
 });
 
 it('does not persists if no state path is given', () => {
-  const state = new State({ path: false });
+  const state = new State({ path: null });
   expect(fs.existsSync(STATE_PATH)).toBe(false);
   state.setState(420, { version: 0 })
   expect(fs.existsSync(STATE_PATH)).toBe(false);

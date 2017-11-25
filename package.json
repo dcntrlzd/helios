@@ -10,7 +10,9 @@
     "build:cleanup": "rm -rf build",
     "build:compile": "tsc --outDir build",
     "testrpc": "better-npm-run testrpc",
-    "start": "TESTRPC_URL=http://localhost:8545 jest --notify --watch",
+    "start:jest": "HELIOS_SNAPSHOT=true HELIOS_NODE_URL=http://localhost:8545 jest --notify --watch",
+    "start:testrpc": "better-npm-run testrpc > testrpc.log ",
+    "start": "npm-run-all -p start:*",
     "pack:clean": "rm *.js *.d.ts; echo",
     "pack:move": "mv build/* .",
     "prepack": "npm-run-all -s pack:clean build:cleanup build:compile pack:move",
@@ -53,8 +55,8 @@
     "web3": "1.0.0-beta.26"
   },
   "jest": {
-    "verbose": true,
     "testEnvironment": "node",
+    "verbose": true,
     "moduleFileExtensions": [
       "js",
       "ts",
@@ -63,7 +65,7 @@
       "sol"
     ],
     "transform": {
-      ".(ts|tsx)": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+      "^.+\\.tsx?$": "ts-jest"
     },
     "testMatch": [
       "**/__tests__/**/*.[tj]s",
@@ -85,7 +87,7 @@
     "npm-run-all": "^4.1.2",
     "prettier": "^1.8.2",
     "regenerator-runtime": "^0.10.5",
-    "ts-jest": "^21.2.2",
+    "ts-jest": "^21.2.3",
     "tslint": "^5.8.0",
     "typescript": "^2.6.0"
   },

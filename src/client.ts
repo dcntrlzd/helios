@@ -1,8 +1,9 @@
 import { BigNumber } from 'bignumber.js';
-import Web3 = require('web3'); // tslint:disable-line
-import { ICompiledContract } from './compiler';
-
 import { Contract } from 'web3/types.d';
+
+import Web3 = require('web3');
+
+import { ICompiledContract } from './compiler';
 
 export interface IDeployOptions {
   contractName?: string;
@@ -33,9 +34,8 @@ export default class Client {
     });
   }
 
-  public getNetwork(): Promise<string> {
-    const net = this.web3.eth.net as { getId: () => Promise<string> };
-    return net.getId();
+  public getNetwork(): Promise<number> {
+    return this.web3.eth.net.getId();
   }
 
   public getCurrentAccount(): string {
