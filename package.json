@@ -1,6 +1,6 @@
 {
   "name": "@dcntrlzd/helios",
-  "version": "0.1.0",
+  "version": "0.1.0-beta.1",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
