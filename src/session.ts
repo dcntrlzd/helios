@@ -26,8 +26,6 @@ export default class Session {
   public constructor(provider: any, options: ISessionOptions = {}, callback?: (Session) => void) {
     if (provider) {
       this.provider = provider;
-    } else if (process.env.HELIOS_NODE_URL) {
-      this.provider = new Web3.providers.HttpProvider(process.env.HELIOS_NODE_URL);
     } else {
       throw new Error('No provider supplied for the session');
     }

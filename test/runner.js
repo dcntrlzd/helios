@@ -1,9 +1,12 @@
 const Session = require('../src/session').default;
 const TestRPC = require('ethereumjs-testrpc');
-const provider = process.env.HELIOS_NODE_URL ? null : TestRPC.provider();
+const web3 = require('web3');
+const provider = process.env.ETHEREUM_NODE_URL ? 
+  new Web3.providers.HttpProvider(process.env.ETHEREUM_NODE_URL) :
+  TestRPC.provider();
 const session = new Session(provider);
 
-const testrpcSnapshotEnabled = process.env.HELIOS_SNAPSHOT === 'true';
+const testrpcSnapshotEnabled = process.env.ETHEREUM_NODE_SNAPSHOT === 'true';
 
 let snapshotId;
 
@@ -17,7 +20,7 @@ beforeEach(async () => {
 
 afterEach(async () => {
   if (!testrpcSnapshotEnabled) {
-    return
+    return;
   } else if (snapshotId) {
     await session.revert(snapshotId);
   }
