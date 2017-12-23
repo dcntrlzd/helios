@@ -26,8 +26,6 @@ export default class Session {
   public constructor(provider: any, options: ISessionOptions = {}, callback?: (Session) => void) {
     if (provider) {
       this.provider = provider;
-    } else if (process.env.HELIOS_NODE_URL) {
-      this.provider = new Web3.providers.HttpProvider(process.env.HELIOS_NODE_URL);
     } else {
       throw new Error('No provider supplied for the session');
     }
@@ -89,14 +87,15 @@ export default class Session {
     this.provider.manager.state.blockchain.vm.on('step', callback);
   }
 
-  private send(method: string, ...params: any[]): Promise<any> {
+  public send(method: string, ...params: any[]): Promise<any> {
     const payload: object = { method, jsonrpc: '2.0', id: new Date().getTime() };
     if (params.length > 0) {
       Object.assign(payload, { params });
     }
 
     return new Promise((resolve, reject) => {
-      this.provider.send(payload, (err, res) => {
+      const sender = this.provider.sendAsync ? this.provider.sendAsync : this.provider.send;
+      sender.call(this.provider, payload, (err, res) => {
         if (!err) {
           resolve(res);
           return;

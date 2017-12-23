@@ -1,13 +1,19 @@
 const Session = require('../src/session').default;
-const TestRPC = require('ethereumjs-testrpc');
-const provider = process.env.HELIOS_NODE_URL ? null : TestRPC.provider();
-const session = new Session(provider);
+const TestRPC = require('ganache-core');
+const Web3 = require('web3');
 
-const testrpcSnapshotEnabled = process.env.HELIOS_SNAPSHOT === 'true';
+const provider = process.env.ETHEREUM_NODE_URL ? 
+  new Web3.providers.HttpProvider(process.env.ETHEREUM_NODE_URL) :
+  TestRPC.provider();
+let session = new Session(provider);
+
+const testrpcSnapshotEnabled = process.env.ETHEREUM_NODE_SNAPSHOT === 'true';
 
 let snapshotId;
 
-beforeAll(() => session.promise);
+beforeAll(() => {
+  return session.promise;
+});
 
 beforeEach(async () => {
   if (testrpcSnapshotEnabled) {

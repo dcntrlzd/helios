@@ -55,7 +55,7 @@ export default class Client {
     });
   }
 
-  public deployContract(
+  public async deployContract(
     { abi, data }: ICompiledContract,
     options: IDeployOptions = {},
   ): Promise<Contract> {
@@ -69,8 +69,12 @@ export default class Client {
 
     const { args } = optionsWithDefaults;
 
-    return (new this.web3.eth.Contract(abi))
+    const contract = await (new this.web3.eth.Contract(abi))
       .deploy({ data, arguments: args })
       .send(optionsWithDefaults);
+
+    contract.setProvider(this.web3.currentProvider);
+
+    return contract;
   }
 }
