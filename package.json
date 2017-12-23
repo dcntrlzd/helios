@@ -42,7 +42,7 @@
     "@types/bignumber.js": "^4.0.3",
     "@types/callsite": "^1.0.30",
     "@types/glob": "^5.0.33",
-    "@types/jest": "^21.1.8",
+    "@types/jest": "^21.1.9",
     "@types/memory-fs": "^0.3.0",
     "@types/node": "^8.0.53",
     "@types/webpack": "^3.8.1",
@@ -56,7 +56,6 @@
   },
   "jest": {
     "testEnvironment": "node",
-    "verbose": true,
     "moduleFileExtensions": [
       "js",
       "ts",
@@ -64,6 +63,7 @@
       "json",
       "sol"
     ],
+    "verbose": true,
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
@@ -74,6 +74,10 @@
     "setupTestFrameworkScriptFile": "<rootDir>/test/prepare.js",
     "transformIgnorePatterns": [
       "<rootDir>/node_modules/"
+    ],
+    "watchPathIgnorePatterns": [
+      "<rootDir>/testrpc.log",
+      "<rootDir>/test/state.json"
     ]
   },
   "devDependencies": {
@@ -82,14 +86,13 @@
     "ethereumjs-testrpc": "^6.0.3",
     "ganache-cli": "^6.0.3",
     "ganache-core": "^2.0.2",
-    "jest": "^21.2.1",
-    "jest-jasmine2": "^21.2.1",
+    "jest": "^22.0.4",
     "memory-fs": "^0.4.1",
     "nodemon": "^1.12.1",
     "npm-run-all": "^4.1.2",
     "prettier": "^1.8.2",
     "regenerator-runtime": "^0.10.5",
-    "ts-jest": "^21.2.3",
+    "ts-jest": "^22.0.0",
     "tslint": "^5.8.0",
     "typescript": "^2.6.0"
   },
