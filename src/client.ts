@@ -73,7 +73,7 @@ export default class Client {
       .deploy({ data, arguments: args })
       .send(optionsWithDefaults);
 
-    contract.setProvider(this.web3.currentProvider);
+    (contract as any).setProvider(this.web3.currentProvider);
 
     return contract;
   }
