@@ -1,6 +1,6 @@
-import path from 'path';
-import webpack from 'webpack';
-import MemoryFileSystem from 'memory-fs';
+import * as path from 'path';
+import * as webpack from 'webpack';
+import MemoryFileSystem = require('memory-fs');
 import heliosLoader from './loader';
 
 function runWebpack(entry: string, options: object = {}): Promise<any> {

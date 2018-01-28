@@ -1,7 +1,8 @@
 import { BigNumber } from 'bignumber.js';
 import { Contract } from 'web3/types.d';
 
-import Web3 from 'web3';
+import Web3Type from 'web3';
+import Web3 = require('web3');
 
 import { ICompiledContract } from './compiler';
 
@@ -21,10 +22,10 @@ export default class Client {
   public DEPLOYMENT_GAS = 3141592;
   public DEPLOYMENT_GAS_PRICE = 100000000000;
 
-  public web3: Web3;
+  public web3: Web3Type;
 
   constructor(provider: any, callback?: (client: Client) => void) {
-    this.web3 = new Web3(provider);
+    this.web3 = (new (Web3 as any)(provider)) as Web3Type;
 
     this.web3.eth.getAccounts().then(([account]) => {
       this.setCurrentAccount(account);

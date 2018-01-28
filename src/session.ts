@@ -1,4 +1,3 @@
-import Web3 from 'web3';
 import Client from './client';
 import Compiler, { ICompiledContract, ICompilerOptions } from './compiler';
 
