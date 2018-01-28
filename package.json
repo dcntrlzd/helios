@@ -1,6 +1,6 @@
 {
   "name": "@dcntrlzd/helios",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
@@ -19,16 +19,10 @@
     "postpack": "npm-run-all -s pack:clean build:cleanup"
   },
   "files": [
-    "client.js",
-    "client.d.ts",
     "compiler.js",
     "compiler.d.ts",
-    "migrator.js",
-    "migrator.d.ts",
     "session.js",
     "session.d.ts",
-    "state.js",
-    "state.d.ts",
     "loader.js",
     "loader.d.ts"
   ],
