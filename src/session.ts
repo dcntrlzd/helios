@@ -1,4 +1,10 @@
-import Client from './client';
+import { BigNumber } from 'bignumber.js';
+import { Contract } from 'web3/types.d';
+
+import Web3Type from 'web3';
+import Web3 = require('web3');
+import { Manager as RequestManager } from 'web3-core-requestmanager';
+
 import Compiler, { ICompiledContract, ICompilerOptions } from './compiler';
 
 export interface ISessionOptions {
@@ -6,18 +12,38 @@ export interface ISessionOptions {
   compiler?: ICompilerOptions;
 }
 
+export interface IDeployOptions {
+  contractName?: string;
+  from?: string;
+  gas?: number;
+  gasPrice?: number;
+  args?: any[];
+}
+
+interface IRequestParams {
+  method: string;
+  params?: any[];
+}
+
+interface IRequestManager {
+  send: (data: IRequestParams, callback: (error: Error, result: any) => any) => void;
+}
+
 export default class Session {
   public static create(provider: any, options: ISessionOptions): Promise<Session> {
     return new Promise((resolve) => new Session(provider, options, resolve));
   }
 
-  public client: Client;
+  public DEPLOYMENT_GAS = 3141592;
+  public DEPLOYMENT_GAS_PRICE = 100000000000;
+
   public promise: Promise<any>;
+  public web3: Web3Type;
   public compile: (path: string) => Promise<any>;
 
   private provider: any;
   private compiler: Compiler;
-  private networkId: number;
+  private requestManager: IRequestManager;
 
   public constructor(provider: any, options: ISessionOptions = {}, callback?: (Session) => void) {
     if (provider) {
@@ -28,60 +54,92 @@ export default class Session {
 
     this.compiler = new Compiler(options.compiler);
     this.compile = this.compiler.compileFile.bind(this.compiler);
+    this.web3 = (new (Web3 as any)(this.provider)) as Web3Type;
 
-    this.promise = Client.create(this.provider).then((client) => {
-      this.client = client;
-      return this.client.getNetwork();
-    }).then((networkId) => {
-      this.networkId = networkId;
-    }).then(() => {
-       if (callback) {
-         callback(this);
-       }
+    this.promise = this.web3.eth.getAccounts()
+      .then(([account]) => {
+        this.setCurrentAccount(account);
+        return this.web3.eth.net.getId();
+      })
+      .then(() => {
+         if (callback) {
+           callback(this);
+         }
+      });
+  }
+
+  public getCurrentAccount(): string {
+    return this.web3.eth.defaultAccount;
+  }
+
+  public setCurrentAccount(account: string): void {
+    this.web3.eth.defaultAccount = account;
+  }
+
+  public async defineContract(
+    { abi }: ICompiledContract,
+    address: string,
+  ): Promise<Contract> {
+    return new this.web3.eth.Contract(abi, address, {
+      from: this.getCurrentAccount(),
     });
   }
 
-  public async deployContract({ abi, data }: ICompiledContract, options = {}): Promise<any> {
-    const { web3 } = this.client;
-    const from = web3.eth.defaultAccount;
+  public async deployContract(
+    { abi, data }: ICompiledContract,
+    options: IDeployOptions = {},
+  ): Promise<Contract> {
+    const optionsWithDefaults = {
+      args: [],
+      from: this.getCurrentAccount(),
+      gas: this.DEPLOYMENT_GAS,
+      gasPrice: this.DEPLOYMENT_GAS_PRICE,
+      ...options,
+    };
 
-    return (new web3.eth.Contract(abi))
-      .deploy({ data, arguments: [] })
-      .send({ from, ...options });
+    const { args } = optionsWithDefaults;
+
+    const contract = await (new this.web3.eth.Contract(abi))
+      .deploy({ data, arguments: args })
+      .send(optionsWithDefaults);
+
+    (contract as any).setProvider(this.web3.currentProvider);
+
+    return contract;
   }
 
-  public snapshot(): Promise<any> {
-    return this.send('evm_snapshot').then(({ result }) => {
-      return result;
-    });
+  public async snapshot(): Promise<any> {
+    const snapshotId = await this.send({ method: 'evm_snapshot' });
+    return this.web3.utils.toDecimal(snapshotId);
   }
 
-  public revert(snapshotId: string): Promise<any> {
-    return this.send('evm_revert', snapshotId);
+  public async  revert(snapshotId: string): Promise<any> {
+    const params = [this.web3.utils.toHex(snapshotId)];
+    return this.send({ method: 'evm_revert', params });
   }
 
-  public attachDebugger(callback): void {
-    if (!this.provider.manager.state.blockchain.vm) {
-      throw new Error('VM not ready yet');
-    }
-    this.provider.manager.state.blockchain.vm.on('step', callback);
+  private getRequestManager(): IRequestManager {
+    if (this.requestManager) { return this.requestManager; }
+    this.requestManager = new RequestManager(this.provider);
+    return this.requestManager;
   }
 
-  public send(method: string, ...params: any[]): Promise<any> {
-    const payload: object = { method, jsonrpc: '2.0', id: new Date().getTime() };
-    if (params.length > 0) {
-      Object.assign(payload, { params });
-    }
-
+  private send(data: IRequestParams): Promise<any> {
     return new Promise((resolve, reject) => {
-      const sender = this.provider.sendAsync ? this.provider.sendAsync : this.provider.send;
-      sender.call(this.provider, payload, (err, res) => {
-        if (!err) {
-          resolve(res);
+      this.getRequestManager().send(data, (error, result) => {
+        if (error) {
+          reject(error);
           return;
         }
-        reject(err);
+        resolve(result);
       });
     });
   }
+
+  // public attachDebugger(callback): void {
+  //   if (!this.provider.manager.state.blockchain.vm) {
+  //     throw new Error('VM not ready yet');
+  //   }
+  //   this.provider.manager.state.blockchain.vm.on('step', callback);
+  // }
 }

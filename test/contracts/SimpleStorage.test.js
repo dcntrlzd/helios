@@ -7,14 +7,14 @@ describe('SimpleStorage', () => {
   let web3;
 
   beforeEach(() => {
-    web3 = helios.client.web3;
+    web3 = helios.web3;
   });
 
   it('stores & retrieves the value with web3 fully', async () => {
-    const from = helios.client.getCurrentAccount();
+    const from = helios.getCurrentAccount();
     const { SimpleStorage } = await helios.compile('./SimpleStorage.sol');
 
-    const contract = await helios.client.deployContract(SimpleStorage);
+    const contract = await helios.deployContract(SimpleStorage);
     const firstValue = await contract.methods.get().call();
     expect(Number(firstValue)).toBe(0);
 
@@ -28,7 +28,7 @@ describe('SimpleStorage', () => {
   // https://github.com/ethereumjs/testrpc/issues/243
   // https://github.com/ethereum/web3.js/issues/392
   it('can sign and recover', async () => {
-    const address = helios.client.getCurrentAccount();
+    const address = helios.getCurrentAccount();
     const message = "HELLO WORLD";
 
     const messageHash = web3.eth.accounts.hashMessage(message);

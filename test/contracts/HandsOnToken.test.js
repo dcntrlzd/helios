@@ -8,11 +8,11 @@ const ETH_TO_WEI = 1000000000000000000;
 
 describe('HandsOnToken', () => {
   it('Creates the token', async () => {
-    const from = helios.client.getCurrentAccount();
+    const from = helios.getCurrentAccount();
     const { HandsOnToken, ExchangeOffice } = await helios.compile('./HandsOnToken.sol');
-    const account = helios.client.getCurrentAccount();
+    const account = helios.getCurrentAccount();
 
-    const contract = await helios.client.deployContract(HandsOnToken, {
+    const contract = await helios.deployContract(HandsOnToken, {
       args: [INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT']
     });
 
@@ -24,17 +24,17 @@ describe('HandsOnToken', () => {
 describe('ExchangeOffice', () => {
   it('Creates the contract and exchanges ETH for HOT', async () => {
     const { HandsOnToken, ExchangeOffice } = await helios.compile('./HandsOnToken.sol');
-    const { web3 } = helios.client;
+    const { web3 } = helios;
     const accounts = await web3.eth.getAccounts();
 
     const [account, testAccount] = accounts;
-    helios.client.setCurrentAccount(account);
+    helios.setCurrentAccount(account);
 
-    const token = await helios.client.deployContract(HandsOnToken, {
+    const token = await helios.deployContract(HandsOnToken, {
       args: [INITIAL_SUPPLY, 'HOT', DECIMALS, 'HOT']
     });
 
-    const contract = await helios.client.deployContract(ExchangeOffice, {
+    const contract = await helios.deployContract(ExchangeOffice, {
       args: [1000, token.options.address]
     });
 
@@ -44,8 +44,8 @@ describe('ExchangeOffice', () => {
     expect(Number(value)).toBe(Math.pow(10, DECIMALS) * 1000);
 
     // Run the exchange contract
-    helios.client.setCurrentAccount(testAccount);
-    await web3.eth.sendTransaction({ to: contract.options.address, value: 2.5 * ETH_TO_WEI, gas: helios.client.DEPLOYMENT_GAS });
+    helios.setCurrentAccount(testAccount);
+    await web3.eth.sendTransaction({ to: contract.options.address, value: 2.5 * ETH_TO_WEI, gas: helios.DEPLOYMENT_GAS });
     
     const balanceOfContract = await web3.eth.getBalance(contract.options.address);
     const tokenBalanceOfTestAccount = await token.methods.balanceOf(testAccount).call();

@@ -44,26 +44,28 @@ function runWebpack(entry: string, options: object = {}): Promise<any> {
   });
 }
 
-it('compiles a basic solidity contract using the loader', () => {
-  return runWebpack('../test/contracts/SimpleStorage.sol').then((info) => {
-    expect(info.modules[0].source).toMatchSnapshot();
+describe('loader', () => {
+  it('compiles a basic solidity contract using the loader', () => {
+    return runWebpack('../test/contracts/SimpleStorage.sol').then((info) => {
+      expect(info.modules[0].source).toMatchSnapshot();
+    });
   });
-});
 
-it('loader handles includeData compileOption', () => {
-  return runWebpack('../test/contracts/SimpleStorage.sol', { includeData: true }).then((info) => {
-    expect(info.modules[0].source).toMatchSnapshot();
+  it('loader handles includeData compileOption', () => {
+    return runWebpack('../test/contracts/SimpleStorage.sol', { includeData: true }).then((info) => {
+      expect(info.modules[0].source).toMatchSnapshot();
+    });
   });
-});
 
-it('compiles a solidity contract with imports using the loader', () => {
-  return runWebpack('../test/contracts/HandsOnToken.sol').then((info) => {
-    expect(info.modules[0].source).toMatchSnapshot();
+  it('compiles a solidity contract with imports using the loader', () => {
+    return runWebpack('../test/contracts/HandsOnToken.sol').then((info) => {
+      expect(info.modules[0].source).toMatchSnapshot();
+    });
   });
-});
 
-it('compiles a solidity contract with deep imports using the loader', () => {
-  return runWebpack('../test/contracts/Tree.sol').then((info) => {
-    expect(info.modules[0].source).toMatchSnapshot();
+  it('compiles a solidity contract with deep imports using the loader', () => {
+    return runWebpack('../test/contracts/Tree.sol').then((info) => {
+      expect(info.modules[0].source).toMatchSnapshot();
+    });
   });
 });
