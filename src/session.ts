@@ -1,12 +1,10 @@
-import Web3 = require('web3');
+import Web3 from 'web3';
 import Client from './client';
 import Compiler, { ICompiledContract, ICompilerOptions } from './compiler';
-import State, { IStateOptions } from './state';
 
 export interface ISessionOptions {
   statePath?: string;
   compiler?: ICompilerOptions;
-  state?: IStateOptions;
 }
 
 export default class Session {
@@ -19,7 +17,6 @@ export default class Session {
   public compile: (path: string) => Promise<any>;
 
   private provider: any;
-  private state: State;
   private compiler: Compiler;
   private networkId: number;
 
@@ -29,8 +26,6 @@ export default class Session {
     } else {
       throw new Error('No provider supplied for the session');
     }
-
-    this.state = new State(options.state);
 
     this.compiler = new Compiler(options.compiler);
     this.compile = this.compiler.compileFile.bind(this.compiler);
@@ -54,20 +49,6 @@ export default class Session {
     return (new web3.eth.Contract(abi))
       .deploy({ data, arguments: [] })
       .send({ from, ...options });
-  }
-
-  public getState(): object {
-    if (!this.networkId) {
-      throw new Error('Cannot read state before networkId is set');
-    }
-    return this.state.getState(this.networkId);
-  }
-
-  public setState(state: object) {
-    if (!this.networkId) {
-      throw new Error('Cannot write state before networkId is set');
-    }
-    this.state.setState(this.networkId, state);
   }
 
   public snapshot(): Promise<any> {

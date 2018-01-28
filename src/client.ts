@@ -1,7 +1,7 @@
 import { BigNumber } from 'bignumber.js';
 import { Contract } from 'web3/types.d';
 
-import Web3 = require('web3');
+import Web3 from 'web3';
 
 import { ICompiledContract } from './compiler';
 

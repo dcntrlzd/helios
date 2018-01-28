@@ -1,10 +1,10 @@
-import * as callsite from 'callsite';
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as mkdirp from 'mkdirp';
-import * as os from 'os';
-import * as path from 'path';
-import * as process from 'process';
+import callsite from 'callsite';
+import crypto from 'crypto';
+import fs from 'fs';
+import mkdirp from 'mkdirp';
+import os from 'os';
+import path from 'path';
+import process from 'process';
 import Web3 = require('web3');
 
 import { ABIDefinition } from 'web3/types.d';

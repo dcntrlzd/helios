@@ -5,6 +5,7 @@
     "inlineSourceMap": true,
     "declaration": true,
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     // Needed for preventing error TS1202
     "module": "commonjs"
   },
