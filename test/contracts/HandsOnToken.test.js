@@ -1,4 +1,3 @@
-const async = require('async');
 const fs = require('fs');
 const helios = require('../runner');
 

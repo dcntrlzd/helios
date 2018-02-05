@@ -1,4 +1,3 @@
-const async = require('async');
 const helios = require('../runner');
 
 describe('SimpleStorage', () => {
