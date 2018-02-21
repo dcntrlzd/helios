@@ -5,6 +5,7 @@
     "inlineSourceMap": true,
     "declaration": true,
     "moduleResolution": "node",
+    "strictPropertyInitialization": true,
     // Needed for preventing error TS1202
     "module": "commonjs",
     "lib": ["es2015", "es2016", "es2017"]

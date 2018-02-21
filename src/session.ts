@@ -1,4 +1,3 @@
-import { BigNumber } from 'bignumber.js';
 import { Contract } from 'web3/types.d';
 
 import Web3Type from 'web3';
@@ -80,9 +79,11 @@ export default class Session {
     { abi }: ICompiledContract,
     address: string,
   ): Promise<Contract> {
-    return new this.web3.eth.Contract(abi, address, {
+    const contract = new this.web3.eth.Contract(abi, address, {
       from: this.getCurrentAccount(),
     });
+
+    return this.prepareContract(contract);
   }
 
   public async deployContract(
@@ -103,9 +104,7 @@ export default class Session {
       .deploy({ data, arguments: args })
       .send(optionsWithDefaults);
 
-    (contract as any).setProvider(this.web3.currentProvider);
-
-    return contract;
+    return this.prepareContract(contract);
   }
 
   public async snapshot(): Promise<any> {
@@ -116,6 +115,12 @@ export default class Session {
   public async  revert(snapshotId: string): Promise<any> {
     const params = [this.web3.utils.toHex(snapshotId)];
     return this.send({ method: 'evm_revert', params });
+  }
+
+  private prepareContract(contract: Contract): Contract {
+    (contract as any).setProvider(this.web3.currentProvider);
+    (contract as any).defaultAccount = this.getCurrentAccount();
+    return contract;
   }
 
   private getRequestManager(): IRequestManager {
@@ -135,11 +140,4 @@ export default class Session {
       });
     });
   }
-
-  // public attachDebugger(callback): void {
-  //   if (!this.provider.manager.state.blockchain.vm) {
-  //     throw new Error('VM not ready yet');
-  //   }
-  //   this.provider.manager.state.blockchain.vm.on('step', callback);
-  // }
 }

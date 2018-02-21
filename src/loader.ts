@@ -4,10 +4,10 @@ import Compiler from './compiler';
 
 // Loader for Webpack
 function loader(source: string) {
-  const options = Object.assign(
-    { includeData: false },
-    loaderUtils.getOptions(this) || {},
-  );
+  const options = {
+    includeData: false,
+    ...(loaderUtils.getOptions(this) || {}),
+  };
 
   const compiler = new Compiler(options);
   const callback = this.async();

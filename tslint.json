@@ -1,10 +1,11 @@
 {
   "defaultSeverity": "error",
   "extends": [
-    "tslint:recommended"
+    "tslint:latest"
   ],
   "jsRules": {},
   "rules": {
+    "no-submodule-imports": [true, "web3"],
     "quotemark": [true, "single", "jsx-double"],
     "indent": [true, "spaces", 2]
   },

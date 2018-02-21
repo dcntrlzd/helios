@@ -118,8 +118,6 @@ export default class Compiler {
       this.writeToCache(checksum, contracts);
     }
 
-    const { includeData } = this;
-
     const compiledContractMap = Object.keys(contracts).reduce((acc, key) => {
       // compiled contract names start with a colon character
       // so we remove it to make it easier to use (through desconstructors especially)
@@ -127,11 +125,11 @@ export default class Compiler {
 
       const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
       const compiledContract = { abi: JSON.parse(rawAbi) as ABIDefinition, gasEstimates };
-      if (includeData) {
+      if (this.includeData) {
         Object.assign(compiledContract, { data });
       }
 
-      return Object.assign(acc, { [contractName]: compiledContract });
+      return { ...acc,  [contractName]: compiledContract };
     }, {});
 
     return compiledContractMap;
