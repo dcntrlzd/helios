@@ -1,6 +1,6 @@
 {
   "name": "@dcntrlzd/helios",
-  "version": "0.1.0-beta.4",
+  "version": "0.1.0-beta.5",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
@@ -35,9 +35,9 @@
     "callsite": "^1.0.0",
     "loader-utils": "^1.1.0",
     "mkdirp": "^0.5.1",
-    "solc": "^0.4.20",
-    "web3": "1.0.0-beta.30",
-    "web3-core-requestmanager": "^1.0.0-beta.30"
+    "solc": "^0.4.21",
+    "web3": "1.0.0-beta.33",
+    "web3-core-requestmanager": "^1.0.0-beta.33"
   },
   "jest": {
     "testEnvironment": "node",
@@ -66,13 +66,13 @@
     ]
   },
   "devDependencies": {
-    "@types/memory-fs": "^0.3.0",
     "@types/callsite": "^1.0.30",
+    "@types/memory-fs": "^0.3.0",
     "@types/node": "^9.4.6",
     "@types/webpack": "^3.8.8",
     "better-npm-run": "^0.1.0",
-    "ganache-cli": "^6.0.3",
-    "ganache-core": "^2.0.2",
+    "ganache-cli": "^6.1.0",
+    "ganache-core": "^2.1.0",
     "jest": "^22.4.0",
     "memory-fs": "^0.4.1",
     "npm-run-all": "^4.1.2",
@@ -80,7 +80,8 @@
     "regenerator-runtime": "^0.11.1",
     "ts-jest": "^22.0.4",
     "tslint": "^5.9.1",
-    "typescript": "^2.7.2"
+    "typescript": "^2.7.2",
+    "webpack": "^4.2.0"
   },
   "directories": {
     "test": "test"

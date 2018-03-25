@@ -42,7 +42,7 @@ contract HandsOnToken is Owned {
         if (balanceOf[_to] + _value < balanceOf[_to]) revert(); // Check for overflows
         balanceOf[msg.sender] -= _value;                     // Subtract from the sender
         balanceOf[_to] += _value;                            // Add the same to the recipient
-        Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
+        emit Transfer(msg.sender, _to, _value);                   // Notify anyone listening that this transfer took place
     }
 
     /* Allow another contract to spend some tokens in your behalf */
@@ -69,7 +69,7 @@ contract HandsOnToken is Owned {
         balanceOf[_from] -= _value;                           // Subtract from the sender
         balanceOf[_to] += _value;                             // Add the same to the recipient
         allowance[_from][msg.sender] -= _value;
-        Transfer(_from, _to, _value);
+        emit Transfer(_from, _to, _value);
         return true;
     }
 
@@ -77,7 +77,7 @@ contract HandsOnToken is Owned {
         if (balanceOf[msg.sender] < _value) revert();            // Check if the sender has enough
         balanceOf[msg.sender] -= _value;                      // Subtract from the sender
         totalSupply -= _value;                                // Updates totalSupply
-        Burn(msg.sender, _value);
+        emit Burn(msg.sender, _value);
         return true;
     }
 
@@ -86,7 +86,7 @@ contract HandsOnToken is Owned {
         if (_value > allowance[_from][msg.sender]) revert();    // Check allowance
         balanceOf[_from] -= _value;                          // Subtract from the sender
         totalSupply -= _value;                               // Updates totalSupply
-        Burn(_from, _value);
+        emit Burn(_from, _value);
         return true;
     }
 
@@ -97,7 +97,7 @@ contract HandsOnToken is Owned {
         balanceOf[msg.sender] += amountToBeMinted;
         totalSupply += amountToBeMinted;
 
-        Transfer(this, msg.sender, amountToBeMinted);                                   // Notify anyone listening that this transfer took place
+        emit Transfer(this, msg.sender, amountToBeMinted);                                   // Notify anyone listening that this transfer took place
         return true;
     }
 }
@@ -121,7 +121,7 @@ contract ExchangeOffice is Owned {
     }
 
     function depositEthers(address depositAddress) public onlyOwner {
-        depositAddress.transfer(this.balance);
+        depositAddress.transfer(address(this).balance);
     }
 
     function depositTokens(address depositAddress) public onlyOwner {

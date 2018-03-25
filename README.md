@@ -4,6 +4,11 @@ Loosely opinionated solidity contract development library.
 * compiles with https://github.com/ethereum/solc-js
 * runs with https://github.com/ethereumjs/ethereumjs-testrpc
 
+## TODO
+* add jest-transformer
+* consider mono repo
+* add typings for index.ts
+
 ## Library Structure
 * compiler (done)
   * Compiles sol files with solc
