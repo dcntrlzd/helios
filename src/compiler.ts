@@ -27,6 +27,7 @@ export interface ICompiledContractMap {
 }
 
 export interface ICompilerOptions {
+  version?: string;
   cacheDir?: string;
   includeData?: boolean;
 }
@@ -84,14 +85,16 @@ export default class Compiler {
       .toString();
   }
 
+  public version: string;
   public cacheDir: string;
   public includeData: boolean;
 
   constructor(options: ICompilerOptions = {}) {
-    const { cacheDir, includeData } = options;
+    const { cacheDir, includeData, version } = options;
 
     this.cacheDir = cacheDir ? cacheDir : this.defaultCacheDir();
     this.includeData = includeData ? includeData : true;
+    this.version = version;
 
     try { // create the cacheDir if not present or accessible
       fs.accessSync(this.cacheDir);
@@ -100,13 +103,22 @@ export default class Compiler {
     }
   }
 
-  public process(source: string): ICompiledContractMap {
+  public async process(source: string): Promise<ICompiledContractMap> {
     const checksum = Compiler.getChecksum(source);
     let contracts = this.readFromCache(checksum);
 
     if (!contracts) {
       if (!Compiler.solc) { // Only require when it's needed (to shave some init time)
-        Compiler.solc = require('solc');
+        const solc = require('solc');
+        const { version } = this;
+
+        if (version) {
+          Compiler.solc = await new Promise((resolve, reject) => {
+            solc.loadRemoteVersion(version, (err, snapshot) => err ? reject(err) : resolve(snapshot));
+          });
+        } else {
+          Compiler.solc = solc;
+        }
       }
 
       const result = Compiler.solc.compile(source);
