@@ -10,8 +10,6 @@ describe('Session', () => {
   });
 
   it('can instantiate a new instance', () => {
-    expect(session.compiler).toBeTruthy();
-    expect(session.compile).toBeTruthy();
     expect(session.web3).toBeTruthy();
   });
 

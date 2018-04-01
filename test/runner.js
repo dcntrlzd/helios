@@ -1,4 +1,5 @@
 const Session = require('../src/session').default;
+const Compiler = require('../src/compiler').default;
 const TestRPC = require('ganache-core');
 const Web3 = require('web3');
 
@@ -6,6 +7,7 @@ const provider = process.env.ETHEREUM_NODE_URL ?
   new Web3.providers.HttpProvider(process.env.ETHEREUM_NODE_URL) :
   TestRPC.provider();
 const session = new Session(provider);
+const compiler = new Compiler();
 
 const testrpcSnapshotEnabled = process.env.ETHEREUM_NODE_SNAPSHOT === 'true';
 
@@ -29,4 +31,4 @@ afterEach(async () => {
   }
 });
 
-module.exports = session;
+module.exports = { session, compiler };

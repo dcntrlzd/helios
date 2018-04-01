@@ -4,12 +4,7 @@ import Web3Type from 'web3';
 import Web3 = require('web3');
 import { Manager as RequestManager } from 'web3-core-requestmanager';
 
-import Compiler, { ICompiledContract, ICompilerOptions } from './compiler';
-
-export interface ISessionOptions {
-  statePath?: string;
-  compiler?: ICompilerOptions;
-}
+import { ICompiledContract, ICompilerOptions } from './compiler';
 
 export interface IDeployOptions {
   contractName?: string;
@@ -29,8 +24,8 @@ interface IRequestManager {
 }
 
 export default class Session {
-  public static create(provider: any, options: ISessionOptions): Promise<Session> {
-    return new Promise((resolve) => new Session(provider, options, resolve));
+  public static create(provider: any): Promise<Session> {
+    return new Promise((resolve) => new Session(provider, resolve));
   }
 
   public DEPLOYMENT_GAS = 3141592;
@@ -41,18 +36,15 @@ export default class Session {
   public compile: (path: string) => Promise<any>;
 
   private provider: any;
-  private compiler: Compiler;
   private requestManager: IRequestManager;
 
-  public constructor(provider: any, options: ISessionOptions = {}, callback?: (Session) => void) {
+  public constructor(provider: any, callback?: (Session) => void) {
     if (provider) {
       this.provider = provider;
     } else {
       throw new Error('No provider supplied for the session');
     }
 
-    this.compiler = new Compiler(options.compiler);
-    this.compile = this.compiler.compileFile.bind(this.compiler);
     this.web3 = (new (Web3 as any)(this.provider)) as Web3Type;
 
     this.promise = this.web3.eth.getAccounts()

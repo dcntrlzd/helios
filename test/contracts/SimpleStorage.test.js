@@ -1,4 +1,4 @@
-const helios = require('../runner');
+const { session, compiler } = require('../runner');
 
 describe('SimpleStorage', () => {
   let ScheduledDistribution;
@@ -6,14 +6,14 @@ describe('SimpleStorage', () => {
   let web3;
 
   beforeEach(() => {
-    web3 = helios.web3;
+    web3 = session.web3;
   });
 
   it('stores & retrieves the value with web3 fully', async () => {
-    const from = helios.getCurrentAccount();
-    const { SimpleStorage } = await helios.compile('./SimpleStorage.sol');
+    const from = session.getCurrentAccount();
+    const { SimpleStorage } = await compiler.compileFile('./SimpleStorage.sol');
 
-    const contract = await helios.deployContract(SimpleStorage);
+    const contract = await session.deployContract(SimpleStorage);
     const firstValue = await contract.methods.get().call();
     expect(Number(firstValue)).toBe(0);
 
@@ -27,7 +27,7 @@ describe('SimpleStorage', () => {
   // https://github.com/ethereumjs/testrpc/issues/243
   // https://github.com/ethereum/web3.js/issues/392
   it('can sign and recover (IMPLEMENT WHEN IT FAILS)', async () => {
-    const address = helios.getCurrentAccount();
+    const address = session.getCurrentAccount();
     const message = "HELLO WORLD";
 
     const messageHash = web3.eth.accounts.hashMessage(message);

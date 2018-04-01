@@ -110,7 +110,7 @@ export default class Compiler {
     if (!contracts) {
       if (!Compiler.solc) { // Only require when it's needed (to shave some init time)
         const solc = require('solc');
-        const { version } = this;
+        const version = this.version;
 
         if (version) {
           Compiler.solc = await new Promise((resolve, reject) => {
