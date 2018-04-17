@@ -22,7 +22,7 @@ contract HandsOnToken is Owned {
     event Burn(address indexed from, uint256 value);
 
     /* Initializes contract with initial supply tokens to the creator of the contract */
-    function HandsOnToken(
+    constructor(
         uint256 initialSupply,
         string tokenName,
         uint8 decimalUnits,
@@ -107,7 +107,7 @@ contract ExchangeOffice is Owned {
 
     HandsOnToken public exchangeToken;
 
-    function ExchangeOffice(
+    constructor(
         uint256 initialExchangeRate,
         HandsOnToken addressOfExchangeToken
     ) public {

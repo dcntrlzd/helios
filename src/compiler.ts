@@ -121,7 +121,7 @@ export default class Compiler {
         }
       }
 
-      const result = Compiler.solc.compile(source);
+      const result = Compiler.solc.compile(source, 1);
 
       if (result.errors) {
         throw new Error(result.errors);

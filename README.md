@@ -30,7 +30,7 @@ Loosely opinionated solidity contract development library.
   * So no migration contract provided by the framework (unlike truffle) but every dev has to come up with their own
 
 ## How to use
-* `npm install @dcntrlzd/helios`
+* `npm install @dcntrlzd/helios solc`
 * Configure webpack to use helios/loader for sol files
 ```js
 {

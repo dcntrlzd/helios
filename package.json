@@ -1,6 +1,6 @@
 {
   "name": "@dcntrlzd/helios",
-  "version": "0.1.0-beta.7",
+  "version": "0.1.0-beta.8",
   "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
   "main": "index.js",
   "scripts": {
@@ -35,9 +35,11 @@
     "callsite": "^1.0.0",
     "loader-utils": "^1.1.0",
     "mkdirp": "^0.5.1",
-    "solc": "^0.4.21",
-    "web3": "1.0.0-beta.33",
-    "web3-core-requestmanager": "^1.0.0-beta.33"
+    "web3": "1.0.0-beta.34",
+    "web3-core-requestmanager": "^1.0.0-beta.34"
+  },
+  "peerDependencies": {
+    "solc": "^0.4.21"
   },
   "jest": {
     "testEnvironment": "node",
@@ -81,6 +83,7 @@
     "ts-jest": "^22.0.4",
     "tslint": "^5.9.1",
     "typescript": "^2.7.2",
+    "solc": "^0.4.22",
     "webpack": "^4.2.0"
   },
   "directories": {
