@@ -1,12 +1,10 @@
-import * as callsite from 'callsite';
+import callsite from 'callsite';
 import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 import * as os from 'os';
 import * as path from 'path';
 import * as process from 'process';
-
-import { ABIDefinition } from 'web3/types.d';
 
 export interface IGasEstimates {
   creation: [number, number];
@@ -17,7 +15,7 @@ export interface IGasEstimates {
 export type ImportResolver = (importPath: string, importContext: string) => Promise<string>;
 
 export interface ICompiledContract {
-  abi: ABIDefinition[];
+  abi: any[];
   data: string;
   gasEstimates: IGasEstimates;
 }
@@ -136,7 +134,7 @@ export default class Compiler {
       const contractName = key.replace(/^:/, '');
 
       const { interface: rawAbi, bytecode: data, gasEstimates } = contracts[key];
-      const compiledContract = { abi: JSON.parse(rawAbi) as ABIDefinition, gasEstimates };
+      const compiledContract = { abi: JSON.parse(rawAbi), gasEstimates };
       if (this.includeData) {
         Object.assign(compiledContract, { data });
       }

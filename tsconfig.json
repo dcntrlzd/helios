@@ -1,17 +1,17 @@
 {
   "compilerOptions": {
+    "pretty": true,
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
     "target": "es2017",
-    "inlineSources": true,
-    "inlineSourceMap": true,
     "declaration": true,
     "moduleResolution": "node",
-    "strictPropertyInitialization": true,
-    // Needed for preventing error TS1202
     "module": "commonjs",
-    "lib": ["es2015", "es2016", "es2017"]
+    "lib": ["es6","es7"],
   },
   "include": [
-    "./node_modules/web3/index.d.ts",
     "./src/**/*.ts"
   ],
   "exclude": [

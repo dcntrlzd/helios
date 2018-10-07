@@ -1,3 +1,3 @@
-import Session from './session';
+import Compiler from './compiler';
 
-module.exports = { Session };
+module.exports = { Compiler };

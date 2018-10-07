@@ -34,12 +34,10 @@
   "dependencies": {
     "callsite": "^1.0.0",
     "loader-utils": "^1.1.0",
-    "mkdirp": "^0.5.1",
-    "web3": "1.0.0-beta.34",
-    "web3-core-requestmanager": "^1.0.0-beta.34"
+    "mkdirp": "^0.5.1"
   },
   "peerDependencies": {
-    "solc": "^0.4.21"
+    "solc": "^0.4.25"
   },
   "jest": {
     "testEnvironment": "node",
@@ -69,22 +67,24 @@
   },
   "devDependencies": {
     "@types/callsite": "^1.0.30",
-    "@types/memory-fs": "^0.3.0",
-    "@types/node": "^9.4.6",
-    "@types/webpack": "^3.8.8",
+    "@types/jest": "^23.3.3",
+    "@types/memory-fs": "^0.3.2",
+    "@types/node": "^10.11.4",
+    "@types/webpack": "^4.4.14",
     "better-npm-run": "^0.1.0",
-    "ganache-cli": "^6.1.0",
-    "ganache-core": "^2.1.0",
-    "jest": "^22.4.0",
+    "ethers": "^4.0.4",
+    "ganache-cli": "^6.1.8",
+    "ganache-core": "^2.2.1",
+    "jest": "^23.6.0",
     "memory-fs": "^0.4.1",
     "npm-run-all": "^4.1.2",
-    "prettier": "^1.10.2",
-    "regenerator-runtime": "^0.11.1",
-    "ts-jest": "^22.0.4",
-    "tslint": "^5.9.1",
-    "typescript": "^2.7.2",
-    "solc": "^0.4.22",
-    "webpack": "^4.2.0"
+    "prettier": "^1.14.3",
+    "regenerator-runtime": "^0.12.1",
+    "solc": "^0.4.25",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.11.0",
+    "typescript": "^3.1.0",
+    "webpack": "^4.20.2"
   },
   "directories": {
     "test": "test"
