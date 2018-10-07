@@ -40,24 +40,15 @@ describe('ExchangeOffice', () => {
     const exchange = await exchangeFactory.deploy(1000, token.address);
     await exchange.deployed();
 
-
     // Transfer tokens to the exchange office
-    await token.functions.transfer(exchange.address, 1000 * Math.pow(10, DECIMALS));
+    const tx = await token.functions.transfer(exchange.address, 1000 * Math.pow(10, DECIMALS));
     const value = await token.functions.balanceOf(exchange.address);
     expect(Number(value)).toBe(Math.pow(10, DECIMALS) * 1000);
 
     // Run the exchange contract
     const otherSigner = provider.getSigner(otherAccount);
     const otherExchange = exchange.connect(otherSigner);
-    await otherExchange.functions.buy({ value: 2.5 * ETH_TO_WEI });
-    // console.log({ to: exchange.address,  })
-    // await otherSigner.sendTransaction({ to: exchange.address, value: 2.5 * ETH_TO_WEI });
-
-    console.warn(2);
-    console.warn(2);
-    console.warn(2);
-    console.warn(2);
-    console.warn(2);
+    await otherSigner.sendTransaction({ to: exchange.address, value: ethers.utils.parseEther('2.5'), gasLimit: 3141592 });
 
     const balanceOfContract = await provider.getBalance(exchange.address);
     const tokenBalanceOfTestAccount = await token.functions.balanceOf(otherAccount);

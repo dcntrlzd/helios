@@ -1,7 +1,7 @@
 {
   "name": "@dcntrlzd/helios",
-  "version": "0.1.0-beta.8",
-  "description": "* compile with https://github.com/ethereum/solc-js * run with https://github.com/ethereumjs/ethereumjs-vm * run flows with jest",
+  "version": "0.2.0-beta.1",
+  "description": "Solidity compiler tools for dapp development",
   "main": "index.js",
   "scripts": {
     "ts": "npx tsc --noEmit --watch --pretty",
@@ -9,10 +9,7 @@
     "build": "npm-run-all -s build:cleanup build:compile",
     "build:cleanup": "rm -rf build",
     "build:compile": "tsc --outDir build",
-    "testrpc": "better-npm-run testrpc",
-    "start:jest": "ETHEREUM_NODE_SNAPSHOT=true ETHEREUM_NODE_URL=http://localhost:8545 jest -i --notify --watch",
-    "start:testrpc": "better-npm-run testrpc > testrpc.log ",
-    "start": "npm-run-all -p start:*",
+    "start": "jest --notify",
     "pack:clean": "rm *.js *.d.ts; echo",
     "pack:move": "mv build/* .",
     "prepack": "npm-run-all -s pack:clean build:cleanup build:compile pack:move",
@@ -21,14 +18,9 @@
   "files": [
     "compiler.js",
     "compiler.d.ts",
-    "session.js",
-    "session.d.ts",
     "loader.js",
     "loader.d.ts"
   ],
-  "betterScripts": {
-    "testrpc": "ganache-cli -m \"$TESTRPC_MNEMONIC\""
-  },
   "author": "Baris Gumustas <barisgumustas@gmail.com>",
   "license": "SEE LICENSE IN LICENSE.md",
   "dependencies": {
@@ -57,13 +49,7 @@
       "**/?(*.)(spec|test).[tj]s"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/prepare.js",
-    "transformIgnorePatterns": [
-      "<rootDir>/node_modules/"
-    ],
-    "watchPathIgnorePatterns": [
-      "<rootDir>/testrpc.log",
-      "<rootDir>/test/state.json"
-    ]
+    "transformIgnorePatterns": [ "<rootDir>/node_modules/" ],
   },
   "devDependencies": {
     "@types/callsite": "^1.0.30",
@@ -71,14 +57,12 @@
     "@types/memory-fs": "^0.3.2",
     "@types/node": "^10.11.4",
     "@types/webpack": "^4.4.14",
-    "better-npm-run": "^0.1.0",
     "ethers": "^4.0.4",
     "ganache-cli": "^6.1.8",
     "ganache-core": "^2.2.1",
     "jest": "^23.6.0",
     "memory-fs": "^0.4.1",
     "npm-run-all": "^4.1.2",
-    "prettier": "^1.14.3",
     "regenerator-runtime": "^0.12.1",
     "solc": "^0.4.25",
     "ts-jest": "^23.10.4",

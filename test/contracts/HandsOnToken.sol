@@ -115,7 +115,7 @@ contract ExchangeOffice is Owned {
         exchangeToken = HandsOnToken(addressOfExchangeToken);
     }
 
-    function buy() public payable {
+    function () public payable {
         uint256 amountToBePaid = (exchangeRate * msg.value) / 1 ether;
         exchangeToken.transfer(msg.sender, amountToBePaid);
     }

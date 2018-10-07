@@ -1,5 +1,5 @@
 import * as path from 'path';
-import * as webpack from 'webpack';
+import webpack = require('webpack');
 import MemoryFileSystem = require('memory-fs');
 import heliosLoader from './loader';
 
