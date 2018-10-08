@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "pretty": true,
-    "sourceMap": true,
+    "inlineSourceMap": true,
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
