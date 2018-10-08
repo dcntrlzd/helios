@@ -1,9 +1,9 @@
 # Helios
 
-Solidity compiler tools for dapp development
-* A wrapper around the solc compiler
+Solidity compilation tools for dapp development
+* A wrapper around the solc compiler with import support
 * Webpack loader using the compiler for importing solidity files
-* SOON jest transformer for importing solidity files
+* SOON: jest transformer for importing solidity files
 
 ## TODO
 * Convert to monorepo with a core package, webpack loader package and a jest transformer package

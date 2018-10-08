@@ -1,8 +1,8 @@
 {
   "name": "@dcntrlzd/helios",
   "version": "0.2.0-beta.1",
-  "description": "Solidity compiler tools for dapp development",
-  "main": "index.js",
+  "description": "Solidity compilation tools for dapp development",
+  "main": "compiler.js",
   "scripts": {
     "ts": "npx tsc --noEmit --watch --pretty",
     "lint": "tslint -p . -e src/external-declarations/**/* --fix",
@@ -13,7 +13,8 @@
     "pack:clean": "rm *.js *.d.ts; echo",
     "pack:move": "mv build/* .",
     "prepack": "npm-run-all -s pack:clean build:cleanup build:compile pack:move",
-    "postpack": "npm-run-all -s pack:clean build:cleanup"
+    "postpack": "npm-run-all -s pack:clean build:cleanup",
+    "publish": "npm publish --access public"
   },
   "files": [
     "compiler.js",
