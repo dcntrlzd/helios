@@ -50,7 +50,7 @@
       "**/?(*.)(spec|test).[tj]s"
     ],
     "setupTestFrameworkScriptFile": "<rootDir>/test/prepare.js",
-    "transformIgnorePatterns": [ "<rootDir>/node_modules/" ],
+    "transformIgnorePatterns": [ "<rootDir>/node_modules/" ]
   },
   "devDependencies": {
     "@types/callsite": "^1.0.30",
