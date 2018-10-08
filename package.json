@@ -13,8 +13,7 @@
     "pack:clean": "rm *.js *.d.ts; echo",
     "pack:move": "mv build/* .",
     "prepack": "npm-run-all -s pack:clean build:cleanup build:compile pack:move",
-    "postpack": "npm-run-all -s pack:clean build:cleanup",
-    "publish": "npm publish --access public"
+    "postpack": "npm-run-all -s pack:clean build:cleanup"
   },
   "files": [
     "compiler.js",
